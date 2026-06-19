@@ -58,12 +58,17 @@
   .nav-links a:hover { background: var(--mint-l); color: var(--mint); }
 
   /* ── ヒーロー ── */
+  .hero-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px 32px;
+  }
   .hero {
-    max-width: 600px; margin: 0 auto;
-    padding: 48px 24px 36px;
+    display: inline-block;
+    padding: 28px 36px 28px;
     text-align: center;
     background: white;
-    border-radius: 0 0 24px 24px;
+    border-radius: 20px;
     box-shadow: 0 4px 20px rgba(150,190,200,0.12);
   }
   .hero-eyebrow {
@@ -224,6 +229,7 @@
 </nav>
 
 <!-- ヒーロー -->
+<div class="hero-wrap">
 <div class="hero">
   <p class="hero-eyebrow">Portfolio — 2026 ✦</p>
   <h1>works & things</h1>
@@ -234,6 +240,7 @@
     <span class="tag tag-pink">🌸 イラスト・デザイン</span>
     <span class="tag tag-purple">✂️ ものづくり</span>
   </div>
+</div>
 </div>
 
 <!-- ツール・アプリ -->
