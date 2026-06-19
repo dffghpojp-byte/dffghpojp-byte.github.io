@@ -231,6 +231,11 @@
     <div class="proj-link-row" id="proj-links"></div>
   </div>
 
+  <div id="related-section" style="display:none; margin-top:16px;">
+    <p class="section-title">🔗 関連プロジェクト</p>
+    <div id="related-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+
   <div class="edit-section" id="edit-section">
     <div class="memo-box">
       <p class="section-title">📷 画像</p>
@@ -279,12 +284,14 @@ const PROJECTS = {
   "waist-tuck-design": {
     title: "ウエストタックシャツ 比較画像",
     desc: "自作版と AI 生成版を並べた着用イメージ比較。SNS 掲載・紹介文の素材として制作。",
-    tags: [["AI生成","tag-pink"],["比較画像","tag-purple"]]
+    tags: [["AI生成","tag-pink"],["比較画像","tag-purple"]],
+    related: [{ id: "waist-dart", note: "この加工をもとに制作" }]
   },
   "stole-cardigan-design": {
     title: "ストールカーディガン 着用イメージ",
     desc: "モデルを統一したカラー・柄違いの着用イメージ画像。素材のバリエーション展示用。",
-    tags: [["AI生成","tag-pink"],["カラー調整","tag-mint"]]
+    tags: [["AI生成","tag-pink"],["カラー調整","tag-mint"]],
+    related: [{ id: "stole-cardigan-making", note: "制作したカーディガンをモデル着用で撮影" }]
   },
   "japanese-garden": {
     title: "和風庭園 背景素材",
@@ -309,12 +316,14 @@ const PROJECTS = {
   "waist-dart": {
     title: "シャツへのウエストダーツ加工",
     desc: "既製シャツにウエストダーツを入れてウエストタックシャツに仕立て直す加工。シルエットをすっきりさせる。",
-    tags: [["ソーイング","tag-mint"],["リメイク","tag-blue"]]
+    tags: [["ソーイング","tag-mint"],["リメイク","tag-blue"]],
+    related: [{ id: "waist-tuck-design", note: "この加工をもとに比較画像を制作" }]
   },
   "stole-cardigan-making": {
     title: "ストールカーディガン 制作",
     desc: "型紙を改良し、フィンガーホール搭載でコートとして着られるストールカーディガンを制作。次はウォッチホール追加を検討中。",
-    tags: [["ソーイング","tag-mint"],["型紙改良","tag-purple"]]
+    tags: [["ソーイング","tag-mint"],["型紙改良","tag-purple"]],
+    related: [{ id: "stole-cardigan-design", note: "制作したカーディガンの着用イメージ画像" }]
   },
   "sns-hobby": {
     title: "「最近ハマっていること」投稿文",
@@ -365,6 +374,43 @@ if (proj) {
     a.className = "btn btn-primary";
     a.textContent = proj.link.label;
     row.appendChild(a);
+  }
+
+  // 関連プロジェクト
+  if (proj.related && proj.related.length > 0) {
+    document.getElementById("related-section").style.display = "block";
+    const list = document.getElementById("related-list");
+    proj.related.forEach(({ id: relId, note }) => {
+      const rel = PROJECTS[relId];
+      if (!rel) return;
+      const card = document.createElement("a");
+      card.href = "project.html?id=" + relId;
+      card.style.cssText = "display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.88); border-radius:12px; padding:14px 18px; text-decoration:none; border:1px solid rgba(255,255,255,0.6); box-shadow:0 3px 12px rgba(150,190,200,0.15); transition:transform 0.15s;";
+      card.onmouseover = () => card.style.transform = "translateY(-2px)";
+      card.onmouseout  = () => card.style.transform = "";
+
+      const thumb = document.createElement("div");
+      thumb.style.cssText = "width:56px; height:56px; border-radius:10px; overflow:hidden; flex-shrink:0; background:linear-gradient(135deg,#d4f5ea,#e0f2fb); position:relative;";
+      const tImg = document.createElement("img");
+      tImg.src = "images/" + relId + ".jpg";
+      tImg.style.cssText = "width:100%; height:100%; object-fit:cover;";
+      tImg.onerror = () => tImg.remove();
+      thumb.appendChild(tImg);
+
+      const text = document.createElement("div");
+      const noteEl = document.createElement("p");
+      noteEl.style.cssText = "font-size:11px; color:#8a9494; margin-bottom:3px;";
+      noteEl.textContent = "🔗 " + note;
+      const titleEl = document.createElement("p");
+      titleEl.style.cssText = "font-size:13px; font-weight:800; color:#5a6e8a;";
+      titleEl.textContent = rel.title;
+      text.appendChild(noteEl);
+      text.appendChild(titleEl);
+
+      card.appendChild(thumb);
+      card.appendChild(text);
+      list.appendChild(card);
+    });
   }
 }
 
