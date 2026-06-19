@@ -193,6 +193,18 @@
     padding: 8px 14px; margin-top: 12px; line-height: 1.6;
   }
 
+  /* ── パスワードロック ── */
+  .lock-btn {
+    margin-left: auto;
+    background: none; border: none; cursor: pointer;
+    font-size: 16px; color: var(--text-s); padding: 4px 8px;
+    border-radius: 8px; transition: background 0.15s;
+    opacity: 0.5;
+  }
+  .lock-btn:hover { background: var(--mint-l); opacity: 1; }
+  .edit-section { display: none; }
+  .edit-section.unlocked { display: block; }
+
   @media (max-width: 480px) {
     .container { padding: 20px 16px 60px; }
     .proj-header { padding: 20px 20px; }
@@ -205,6 +217,7 @@
 <nav>
   <a class="back-btn" href="index.html">← 一覧に戻る</a>
   <span class="nav-title" id="nav-title"></span>
+  <button class="lock-btn" id="lock-btn" title="編集モード">🔒</button>
 </nav>
 
 <div class="container">
@@ -215,18 +228,20 @@
     <div class="proj-link-row" id="proj-links"></div>
   </div>
 
-  <div class="memo-box">
-    <p class="section-title">📷 画像</p>
-    <div class="gallery" id="gallery"></div>
-    <button class="add-image-btn" id="add-image-btn">＋ 画像を追加</button>
-    <p class="save-notice">💡 画像はこのブラウザに保存されます。GitHub に公開するには <code>images/</code> フォルダに追加してください。</p>
-  </div>
+  <div class="edit-section" id="edit-section">
+    <div class="memo-box">
+      <p class="section-title">📷 画像</p>
+      <div class="gallery" id="gallery"></div>
+      <button class="add-image-btn" id="add-image-btn">＋ 画像を追加</button>
+      <p class="save-notice">💡 画像はこのブラウザに保存されます。GitHub に公開するには <code>images/</code> フォルダに追加してください。</p>
+    </div>
 
-  <div class="memo-box" style="margin-top:16px;">
-    <p class="section-title">📝 メモ・詳細テキスト</p>
-    <textarea class="memo-area" id="memo-area" placeholder="制作過程・こだわり・使用ツールなど、自由に書いてください…"></textarea>
-    <p class="memo-saved" id="memo-saved">✓ 保存しました</p>
-    <p class="save-notice">💡 メモはこのブラウザに自動保存されます。</p>
+    <div class="memo-box" style="margin-top:16px;">
+      <p class="section-title">📝 メモ・詳細テキスト</p>
+      <textarea class="memo-area" id="memo-area" placeholder="制作過程・こだわり・使用ツールなど、自由に書いてください…"></textarea>
+      <p class="memo-saved" id="memo-saved">✓ 保存しました</p>
+      <p class="save-notice">💡 メモはこのブラウザに自動保存されます。</p>
+    </div>
   </div>
 </div>
 
@@ -338,6 +353,39 @@ if (proj) {
     row.appendChild(a);
   }
 }
+
+// ── パスワードロック ──
+const PASSWORD = "yuika2026"; // ← パスワードはここで変更できます
+const UNLOCK_KEY = "portfolio_unlocked";
+const editSection = document.getElementById("edit-section");
+const lockBtn = document.getElementById("lock-btn");
+
+function unlock() {
+  sessionStorage.setItem(UNLOCK_KEY, "1");
+  editSection.classList.add("unlocked");
+  lockBtn.textContent = "🔓";
+  lockBtn.title = "編集モード（解除中）";
+}
+
+if (sessionStorage.getItem(UNLOCK_KEY) === "1") {
+  unlock();
+}
+
+lockBtn.addEventListener("click", () => {
+  if (editSection.classList.contains("unlocked")) {
+    sessionStorage.removeItem(UNLOCK_KEY);
+    editSection.classList.remove("unlocked");
+    lockBtn.textContent = "🔒";
+    lockBtn.title = "編集モード";
+  } else {
+    const input = prompt("パスワードを入力してください");
+    if (input === PASSWORD) {
+      unlock();
+    } else if (input !== null) {
+      alert("パスワードが違います");
+    }
+  }
+});
 
 // ── 画像ギャラリー（localStorage） ──
 const STORAGE_KEY = "proj_images_" + id;
