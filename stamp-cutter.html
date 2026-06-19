@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LINE スタンプ カッター v1.0</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.js"></script>
+  <style>
+    :root {
+      --blue-100: #e8f4fd;
+      --blue-200: #c8e6fa;
+      --blue-300: #a3d4f5;
+      --blue-400: #7bb3e0;
+      --blue-500: #5ba3d9;
+      --blue-600: #3d8ec7;
+      --white: #ffffff;
+      --gray-50: #f8fbff;
+      --gray-100: #f0f7ff;
+      --gray-300: #b0c8de;
+      --gray-500: #6a8da8;
+      --gray-700: #3d5a72;
+      --shadow: 0 2px 12px rgba(91, 163, 217, 0.15);
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, var(--blue-100) 0%, #f0f7ff 50%, var(--blue-200) 100%);
+      min-height: 100vh;
+      color: var(--gray-700);
+    }
+
+    /* ── ヘッダー ── */
+    header {
+      background: linear-gradient(90deg, var(--blue-400), var(--blue-500));
+      color: white;
+      padding: 20px 24px 18px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(91, 163, 217, 0.35);
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    header h1 span.ver { font-size: 0.85rem; opacity: 0.85; margin-left: 8px; }
+    header p.author {
+      font-size: 0.78rem;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    /* ── メインコンテナ ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── カード ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--blue-600);
+      margin-bottom: 16px;
+    }
+    .card-title .step-badge {
+      background: var(--blue-500);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── ドロップゾーン ── */
+    #dropzone {
+      border: 2.5px dashed var(--blue-300);
+      border-radius: var(--radius);
+      background: var(--blue-100);
+      padding: 44px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #dropzone:hover, #dropzone.over {
+      border-color: var(--blue-500);
+      background: var(--blue-200);
+    }
+    #dropzone .icon { font-size: 2.4rem; margin-bottom: 10px; }
+    #dropzone p { color: var(--gray-500); font-size: 0.9rem; line-height: 1.7; }
+    #dropzone p strong { color: var(--blue-600); }
+    #file-input { display: none; }
+
+    /* ── グリッド設定 ── */
+    .preset-group { display: flex; flex-direction: column; gap: 8px; }
+    .preset-group-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .size-note {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--gray-500);
+      background: var(--blue-100);
+      border-radius: 20px;
+      padding: 2px 9px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--blue-200);
+    }
+    .type-label { font-size: 0.85rem; color: var(--gray-500); white-space: nowrap; }
+
+    .grid-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .grid-row label { font-size: 0.88rem; color: var(--gray-500); white-space: nowrap; }
+    .grid-preset {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--blue-300);
+      background: white;
+      color: var(--blue-600);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--blue-500);
+      border-color: var(--blue-500);
+      color: white;
+    }
+    .num-input {
+      width: 64px;
+      padding: 6px 8px;
+      border: 1.5px solid var(--blue-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      color: var(--gray-700);
+      text-align: center;
+      outline: none;
+    }
+    .num-input:focus { border-color: var(--blue-500); }
+
+    /* ── 背景除去 ── */
+    .bg-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    #bg-color {
+      width: 42px;
+      height: 30px;
+      border: 1.5px solid var(--blue-300);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .slider-row label { font-size: 0.85rem; color: var(--gray-500); white-space: nowrap; }
+    input[type="range"] {
+      accent-color: var(--blue-500);
+      width: 140px;
+    }
+    .slider-val {
+      font-size: 0.82rem;
+      color: var(--blue-600);
+      font-weight: 600;
+      min-width: 28px;
+    }
+
+    /* ── プレビューエリア ── */
+    #preview-wrap { display: none; }
+    #preview-container {
+      position: relative;
+      overflow: auto;
+      max-height: 520px;
+      border: 2px solid var(--blue-200);
+      border-radius: var(--radius-sm);
+      background: repeating-conic-gradient(#dce9f5 0% 25%, #f0f7ff 0% 50%) 0 0 / 14px 14px;
+    }
+    #preview-canvas { display: block; cursor: crosshair; }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── ボタン ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 24px;
+      border-radius: 24px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, var(--blue-500), var(--blue-400));
+      color: white;
+      box-shadow: 0 4px 14px rgba(91, 163, 217, 0.4);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(91, 163, 217, 0.5);
+    }
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn-outline {
+      background: white;
+      border: 2px solid var(--blue-400);
+      color: var(--blue-600);
+    }
+    .btn-outline:hover { background: var(--blue-100); }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    /* ── プログレス ── */
+    #progress-wrap { display: none; margin-top: 16px; }
+    .progress-bar-bg {
+      background: var(--blue-100);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-400), var(--blue-500));
+      border-radius: 999px;
+      transition: width 0.2s;
+      width: 0%;
+    }
+    #progress-label {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      margin-top: 6px;
+    }
+
+    /* ── 切り出しプレビュー ── */
+    #cut-preview-section { display: none; }
+    .cut-preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .cut-preview-top .card-title { margin-bottom: 0; }
+    .count-badge {
+      background: var(--blue-100);
+      color: var(--blue-600);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 10px;
+    }
+    .stamp-thumb {
+      border: 1.5px solid var(--blue-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .stamp-thumb:not(.selected) { opacity: 0.35; }
+    .stamp-thumb.selected {
+      border-color: var(--blue-500);
+      box-shadow: 0 0 0 2px rgba(91,163,217,0.45);
+    }
+    .thumb-check {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: white;
+      border: 1.5px solid var(--blue-300);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: transparent;
+      z-index: 2; transition: all 0.15s;
+    }
+    .stamp-thumb.selected .thumb-check {
+      background: var(--blue-500);
+      border-color: var(--blue-500);
+      color: white;
+    }
+    .select-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    #select-count { font-size: 0.82rem; color: var(--gray-500); }
+    #apng-result {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.84rem;
+      color: #2d7d5a;
+      background: linear-gradient(90deg, #d0eedd, #c5e8f0);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      line-height: 1.8;
+    }
+    .stamp-thumb-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      display: block;
+      background: repeating-conic-gradient(#dce9f5 0% 25%, #f0f7ff 0% 50%) 0 0 / 10px 10px;
+    }
+    .stamp-thumb-label {
+      background: white;
+      border-top: 1px solid var(--blue-100);
+      padding: 4px 6px;
+      font-size: 0.68rem;
+      color: var(--gray-500);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ── APNG セクション ── */
+    .apng-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .apng-label { font-size: 0.88rem; color: var(--gray-500); white-space: nowrap; }
+    #apng-warning {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: #c0392b;
+      background: #fdf0ed;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+
+    /* ── フッター ── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: var(--gray-300);
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.25rem; }
+      .card { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🖼️ LINE スタンプ カッター <span class="ver">v1.0</span></h1>
+  <p class="author">by @ユイカ</p>
+</header>
+
+<main>
+
+  <!-- STEP 1: アップロード -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge">1</span> スタンプシートをアップロード
+    </div>
+    <div id="dropzone">
+      <div class="icon">📁</div>
+      <p><strong>クリックまたはドラッグ&ドロップ</strong>で画像を選択<br/>
+        PNG / JPG / WEBP 対応</p>
+    </div>
+    <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" />
+  </div>
+
+  <!-- STEP 2: グリッド・背景設定 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge">2</span> グリッド・背景の設定
+    </div>
+
+    <div class="preset-group">
+      <div class="preset-group-label">🎨 絵文字用 <span class="size-note">出力サイズ：180×180px</span></div>
+      <div class="grid-preset">
+        <button class="preset-btn" data-col="4" data-row="10" data-type="emoji">4×10 (40枚)</button>
+        <button class="preset-btn active" data-col="5" data-row="8" data-type="emoji">5×8 (40枚)</button>
+      </div>
+    </div>
+    <div class="preset-group" style="margin-top: 12px;">
+      <div class="preset-group-label">🖼️ スタンプ用 <span class="size-note">出力サイズ：最大 370×320px</span></div>
+      <div class="grid-preset">
+        <button class="preset-btn" data-col="4" data-row="8" data-type="stamp">4×8 (32枚)</button>
+        <button class="preset-btn" data-col="4" data-row="4" data-type="stamp">4×4 (16枚)</button>
+        <button class="preset-btn" data-col="2" data-row="4" data-type="stamp">2×4 (8枚)</button>
+      </div>
+    </div>
+
+    <div class="type-row">
+      <span class="type-label">カスタム時の出力：</span>
+      <label class="radio-btn">
+        <input type="radio" name="output-type" value="emoji" checked /> 絵文字 (180×180px)
+      </label>
+      <label class="radio-btn">
+        <input type="radio" name="output-type" value="stamp" /> スタンプ (最大370×320px)
+      </label>
+    </div>
+
+    <div class="grid-row" style="margin-top: 12px;">
+      <label>カスタム：列</label>
+      <input class="num-input" type="number" id="input-cols" min="1" max="20" value="5" />
+      <label>行</label>
+      <input class="num-input" type="number" id="input-rows" min="1" max="20" value="8" />
+    </div>
+
+    <div class="bg-row">
+      <span style="font-size:0.88rem; color: var(--gray-500);">🎨 除去する背景色</span>
+      <input type="color" id="bg-color" value="#00c300" title="クリックして色を変更できます" />
+      <span style="font-size:0.78rem; color: var(--gray-500);">クリックして色を変更できます</span>
+    </div>
+
+    <div class="slider-row">
+      <label>透過しきい値（感度）</label>
+      <input type="range" id="threshold" min="10" max="250" value="150" />
+      <span class="slider-val" id="threshold-val">150</span>
+    </div>
+  </div>
+
+  <!-- STEP 3: プレビュー -->
+  <div class="card" id="preview-wrap">
+    <div class="card-title">
+      <span class="step-badge">3</span> プレビュー・分割ラインの調整
+    </div>
+    <div id="preview-container">
+      <canvas id="preview-canvas"></canvas>
+    </div>
+    <p class="hint">💡 分割ラインをドラッグして位置を微調整できます</p>
+  </div>
+
+  <!-- STEP 4: 切り出し・ダウンロード -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge">4</span> 切り出してダウンロード
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-cut" disabled>
+        ✂️ 切り出し開始
+      </button>
+      <button class="btn btn-outline" id="btn-reset">
+        🔄 リセット
+      </button>
+    </div>
+
+    <div id="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div id="progress-label">処理中…</div>
+    </div>
+
+  </div>
+
+  <!-- STEP 5: 切り出しプレビュー -->
+  <div class="card" id="cut-preview-section">
+    <div class="cut-preview-top">
+      <div class="card-title">
+        <span class="step-badge">5</span> 切り出しプレビュー
+        <span class="count-badge" id="cut-count">0枚</span>
+      </div>
+      <button class="btn btn-primary" id="btn-zip">⬇️ ZIP でまとめてDL</button>
+    </div>
+    <div class="select-row">
+      <button class="btn btn-outline" id="btn-select-all" style="padding:5px 14px;font-size:0.8rem;">全選択</button>
+      <button class="btn btn-outline" id="btn-deselect-all" style="padding:5px 14px;font-size:0.8rem;">全解除</button>
+      <span id="select-count">0枚選択中</span>
+    </div>
+    <div class="stamp-grid" id="stamp-grid"></div>
+  </div>
+
+  <!-- STEP 6: APNGアニメーション出力 -->
+  <div class="card" id="apng-section" style="display:none">
+    <div class="card-title">
+      <span class="step-badge">6</span> ✨ APNGアニメーション出力
+    </div>
+
+    <div class="slider-row">
+      <label>フレーム遅延</label>
+      <input type="range" id="apng-delay" min="50" max="500" value="100" step="10" />
+      <span class="slider-val" id="apng-delay-val">100ms</span>
+    </div>
+
+    <div class="grid-row" style="margin-top:12px;">
+      <label class="apng-label">ループ回数</label>
+      <input class="num-input" type="number" id="apng-loops" min="0" max="99" value="0" />
+      <span style="font-size:0.78rem; color:var(--gray-500);">（0 = 無限ループ）</span>
+    </div>
+
+    <div class="apng-row" style="margin-top:14px;">
+      <span class="apng-label">出力サイズ</span>
+      <div class="grid-preset">
+        <button class="preset-btn active" data-apng-size="180">180×180</button>
+        <button class="preset-btn" data-apng-size="240">240×240</button>
+        <button class="preset-btn" data-apng-size="320">320×320</button>
+        <button class="preset-btn" data-apng-size="0">元サイズ</button>
+      </div>
+    </div>
+
+    <div class="bg-row" style="margin-top:14px;">
+      <span style="font-size:0.88rem; color:var(--gray-500);">出力範囲：</span>
+      <label class="radio-btn">
+        <input type="radio" name="apng-range" value="all" checked /> 全フレームで1つのAPNG
+      </label>
+      <label class="radio-btn">
+        <input type="radio" name="apng-range" value="row" /> 行ごとに分割
+      </label>
+    </div>
+
+    <p style="font-size:0.82rem;color:var(--gray-500);margin-bottom:4px;">
+      ↑ <strong>STEP 5</strong> の切り出しプレビューで使うフレームを選択してください（デフォルト：全選択）
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-apng" disabled>✨ APNGアニメを生成・DL</button>
+    </div>
+    <div id="apng-result"></div>
+    <div id="apng-warning"></div>
+  </div>
+
+</main>
+
+<footer>LINE スタンプ カッター v1.0 — by @ユイカ</footer>
+
+<script>
+// ────────────────────────────────────────────
+// 状態
+// ────────────────────────────────────────────
+let originalImage = null;
+let cols = 5, rows = 8;
+let storedZipBlob = null;
+let thumbObjectURLs = [];
+let outputType = 'emoji'; // 'emoji' | 'stamp'
+let stampCells = [];      // APNG用: { canvas, num }
+let apngOutputSize = 180;
+let selectedNums = new Set();
+let lineX = [];  // cols-1 本の縦分割ライン (canvas座標)
+let lineY = [];  // rows-1 本の横分割ライン (canvas座標)
+let dragging = null;  // { axis: 'x'|'y', idx: number }
+const HANDLE_R = 6;
+
+const canvas = document.getElementById('preview-canvas');
+const ctx = canvas.getContext('2d');
+
+// ────────────────────────────────────────────
+// ファイル読み込み
+// ────────────────────────────────────────────
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) loadFile(fileInput.files[0]);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      originalImage = img;
+      initPreview();
+      document.getElementById('btn-cut').disabled = false;
+      hideDone();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ────────────────────────────────────────────
+// プリセット・グリッド入力
+// ────────────────────────────────────────────
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    cols = parseInt(btn.dataset.col);
+    rows = parseInt(btn.dataset.row);
+    document.getElementById('input-cols').value = cols;
+    document.getElementById('input-rows').value = rows;
+    if (btn.dataset.type) {
+      outputType = btn.dataset.type;
+      document.querySelector(`input[name="output-type"][value="${outputType}"]`).checked = true;
+    }
+    if (originalImage) initPreview();
+  });
+});
+
+document.querySelectorAll('input[name="output-type"]').forEach(r => {
+  r.addEventListener('change', () => { outputType = r.value; });
+});
+
+document.getElementById('input-cols').addEventListener('change', e => {
+  cols = Math.max(1, Math.min(20, parseInt(e.target.value) || 1));
+  e.target.value = cols;
+  clearPresetActive();
+  if (originalImage) initPreview();
+});
+document.getElementById('input-rows').addEventListener('change', e => {
+  rows = Math.max(1, Math.min(20, parseInt(e.target.value) || 1));
+  e.target.value = rows;
+  clearPresetActive();
+  if (originalImage) initPreview();
+});
+
+function clearPresetActive() {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+}
+
+// ────────────────────────────────────────────
+// しきい値スライダー
+// ────────────────────────────────────────────
+const thresholdInput = document.getElementById('threshold');
+const thresholdVal = document.getElementById('threshold-val');
+thresholdInput.addEventListener('input', () => {
+  thresholdVal.textContent = thresholdInput.value;
+});
+
+// ────────────────────────────────────────────
+// プレビュー初期化
+// ────────────────────────────────────────────
+const MAX_CANVAS_W = 780;
+
+function initPreview() {
+  const img = originalImage;
+  const scale = img.width > MAX_CANVAS_W ? MAX_CANVAS_W / img.width : 1;
+  const cw = Math.round(img.width * scale);
+  const ch = Math.round(img.height * scale);
+
+  canvas.width = cw;
+  canvas.height = ch;
+
+  // 等分割ラインを初期配置
+  lineX = [];
+  for (let i = 1; i < cols; i++) lineX.push(Math.round(cw * i / cols));
+  lineY = [];
+  for (let i = 1; i < rows; i++) lineY.push(Math.round(ch * i / rows));
+
+  document.getElementById('preview-wrap').style.display = 'block';
+  drawPreview();
+}
+
+function drawPreview() {
+  if (!originalImage) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = 'rgba(91, 163, 217, 0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  lineX.forEach(x => {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  });
+  lineY.forEach(y => {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  const drawHandle = (x, y) => {
+    ctx.beginPath();
+    ctx.arc(x, y, HANDLE_R, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(61, 142, 199, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+  lineX.forEach(x => drawHandle(x, canvas.height / 2));
+  lineY.forEach(y => drawHandle(canvas.width / 2, y));
+
+  // セル番号を描画
+  const allCellX = [0, ...lineX, canvas.width];
+  const allCellY = [0, ...lineY, canvas.height];
+  const cellW = allCellX[1] - allCellX[0];
+  const fontSize = Math.max(10, Math.min(18, Math.round(cellW * 0.18)));
+  ctx.font = `bold ${fontSize}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  let n = 1;
+  for (let r = 0; r < allCellY.length - 1; r++) {
+    for (let c = 0; c < allCellX.length - 1; c++) {
+      const cx = (allCellX[c] + allCellX[c + 1]) / 2;
+      const cy = (allCellY[r] + allCellY[r + 1]) / 2;
+      const label = String(n).padStart(3, '0');
+
+      // 影
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillText(label, cx + 1, cy + 1);
+      // 本文字
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.fillText(label, cx, cy);
+      n++;
+    }
+  }
+}
+
+// ────────────────────────────────────────────
+// ドラッグ操作
+// ────────────────────────────────────────────
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {
+    x: (t.clientX - rect.left) * (canvas.width / rect.width),
+    y: (t.clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+function findHandle(pos) {
+  for (let i = 0; i < lineX.length; i++) {
+    const cy = canvas.height / 2;
+    if (Math.hypot(pos.x - lineX[i], pos.y - cy) < HANDLE_R + 6) return { axis: 'x', idx: i };
+  }
+  for (let i = 0; i < lineY.length; i++) {
+    const cx = canvas.width / 2;
+    if (Math.hypot(pos.x - cx, pos.y - lineY[i]) < HANDLE_R + 6) return { axis: 'y', idx: i };
+  }
+  for (let i = 0; i < lineX.length; i++) {
+    if (Math.abs(pos.x - lineX[i]) < 6) return { axis: 'x', idx: i };
+  }
+  for (let i = 0; i < lineY.length; i++) {
+    if (Math.abs(pos.y - lineY[i]) < 6) return { axis: 'y', idx: i };
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown', e => { dragging = findHandle(getPos(e)); });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); dragging = findHandle(getPos(e)); }, { passive: false });
+
+canvas.addEventListener('mousemove', e => {
+  const pos = getPos(e);
+  if (dragging) {
+    if (dragging.axis === 'x') lineX[dragging.idx] = Math.max(2, Math.min(canvas.width - 2, pos.x));
+    else lineY[dragging.idx] = Math.max(2, Math.min(canvas.height - 2, pos.y));
+    drawPreview();
+  } else {
+    canvas.style.cursor = findHandle(pos) ? 'ew-resize' : 'default';
+  }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const pos = getPos(e);
+  if (dragging) {
+    if (dragging.axis === 'x') lineX[dragging.idx] = Math.max(2, Math.min(canvas.width - 2, pos.x));
+    else lineY[dragging.idx] = Math.max(2, Math.min(canvas.height - 2, pos.y));
+    drawPreview();
+  }
+}, { passive: false });
+
+window.addEventListener('mouseup', () => { dragging = null; });
+window.addEventListener('touchend', () => { dragging = null; });
+
+// ────────────────────────────────────────────
+// 背景透過
+// ────────────────────────────────────────────
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function removeBackground(imgData, targetRgb, threshold) {
+  const { width, height, data } = imgData;
+  const [tr, tg, tb] = targetRgb;
+  const visited = new Uint8Array(width * height);
+  const queue = [];
+  let head = 0;
+
+  function matches(idx) {
+    const p = idx * 4;
+    return Math.abs(data[p] - tr) + Math.abs(data[p+1] - tg) + Math.abs(data[p+2] - tb) <= threshold;
+  }
+
+  // 画像の縁のピクセルだけをシード（縁と繋がる背景色のみ透過）
+  function seed(idx) {
+    if (visited[idx]) return;
+    visited[idx] = 1;
+    if (matches(idx)) queue.push(idx);
+  }
+  for (let x = 0; x < width; x++) {
+    seed(x);
+    seed((height - 1) * width + x);
+  }
+  for (let y = 1; y < height - 1; y++) {
+    seed(y * width);
+    seed(y * width + width - 1);
+  }
+
+  // BFS で繋がる背景色ピクセルを透過
+  while (head < queue.length) {
+    const idx = queue[head++];
+    data[idx * 4 + 3] = 0;
+    const x = idx % width;
+    const y = (idx / width) | 0;
+    if (x > 0)           seed(idx - 1);
+    if (x < width - 1)   seed(idx + 1);
+    if (y > 0)           seed(idx - width);
+    if (y < height - 1)  seed(idx + width);
+  }
+}
+
+// ────────────────────────────────────────────
+// 切り出し・ZIP 生成
+// ────────────────────────────────────────────
+function resizeCell(src, sw, sh) {
+  let dw, dh;
+  if (outputType === 'emoji') {
+    // 180×180 に収めて中央配置
+    const s = Math.min(180 / sw, 180 / sh);
+    dw = Math.round(sw * s);
+    dh = Math.round(sh * s);
+    const c = document.createElement('canvas');
+    c.width = 180; c.height = 180;
+    const x = Math.round((180 - dw) / 2);
+    const y = Math.round((180 - dh) / 2);
+    c.getContext('2d').drawImage(src, 0, 0, sw, sh, x, y, dw, dh);
+    return c;
+  } else {
+    // 370×320 を超える場合のみ縮小、収まる場合はそのまま
+    const s = Math.min(1, 370 / sw, 320 / sh);
+    if (s === 1) return src;
+    dw = Math.round(sw * s);
+    dh = Math.round(sh * s);
+    const c = document.createElement('canvas');
+    c.width = dw; c.height = dh;
+    c.getContext('2d').drawImage(src, 0, 0, sw, sh, 0, 0, dw, dh);
+    return c;
+  }
+}
+
+document.getElementById('btn-cut').addEventListener('click', cutAndDownload);
+
+async function cutAndDownload() {
+  if (!originalImage) return;
+
+  const bgColor = hexToRgb(document.getElementById('bg-color').value);
+  const threshold = parseInt(thresholdInput.value);
+
+  const scale = canvas.width / originalImage.width;
+  const allX = [0, ...lineX.map(x => Math.round(x / scale)), originalImage.width];
+  const allY = [0, ...lineY.map(y => Math.round(y / scale)), originalImage.height];
+
+  const totalCells = (allX.length - 1) * (allY.length - 1);
+  const zip = new JSZip();
+
+  const progressWrap = document.getElementById('progress-wrap');
+  const progressBar = document.getElementById('progress-bar');
+  const progressLabel = document.getElementById('progress-label');
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+
+  thumbObjectURLs.forEach(u => URL.revokeObjectURL(u));
+  thumbObjectURLs = [];
+  stampCells = [];
+
+  const offscreen = document.createElement('canvas');
+  const offCtx = offscreen.getContext('2d');
+  const collectedBlobs = [];
+
+  let count = 0;
+  for (let row = 0; row < allY.length - 1; row++) {
+    for (let col = 0; col < allX.length - 1; col++) {
+      const sx = allX[col];
+      const sy = allY[row];
+      const sw = allX[col + 1] - sx;
+      const sh = allY[row + 1] - sy;
+
+      offscreen.width = sw;
+      offscreen.height = sh;
+      offCtx.clearRect(0, 0, sw, sh);
+      offCtx.drawImage(originalImage, sx, sy, sw, sh, 0, 0, sw, sh);
+
+      const imgData = offCtx.getImageData(0, 0, sw, sh);
+      removeBackground(imgData, bgColor, threshold);
+      offCtx.putImageData(imgData, 0, 0);
+
+      // APNG用にキャンバスを複製保存（背景除去済み・リサイズ前）
+      const cellCv = document.createElement('canvas');
+      cellCv.width = sw; cellCv.height = sh;
+      cellCv.getContext('2d').drawImage(offscreen, 0, 0);
+      stampCells.push({ canvas: cellCv, num: count + 1 });
+
+      const num = String(count + 1).padStart(3, '0');
+      const out = resizeCell(offscreen, sw, sh);
+      const blob = await canvasToBlob(out);
+      zip.file(`stamp_${num}.png`, blob);
+      collectedBlobs.push({ blob, num });
+
+      // 001番目から tab.png・main.png を生成（アスペクト比を保って中央配置）
+      if (count === 0) {
+        const makeFixed = async (w, h) => {
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          const s = Math.min(w / sw, h / sh);
+          const dw = Math.round(sw * s), dh = Math.round(sh * s);
+          c.getContext('2d').drawImage(offscreen, 0, 0, sw, sh,
+            Math.round((w - dw) / 2), Math.round((h - dh) / 2), dw, dh);
+          return canvasToBlob(c);
+        };
+        zip.file('tab.png',  await makeFixed(96, 74));
+        zip.file('main.png', await makeFixed(240, 240));
+      }
+
+      count++;
+      const pct = Math.round(count / totalCells * 100);
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = `処理中… ${count} / ${totalCells}`;
+
+      if (count % 5 === 0) await sleep(0);
+    }
+  }
+
+  progressLabel.textContent = 'ZIPを生成中…';
+  storedZipBlob = await zip.generateAsync({ type: 'blob' });
+
+  progressWrap.style.display = 'none';
+
+  renderThumbnails(collectedBlobs);
+  const section = document.getElementById('cut-preview-section');
+  section.style.display = 'block';
+  document.getElementById('apng-section').style.display = 'block';
+  document.getElementById('apng-warning').style.display = 'none';
+  document.getElementById('btn-apng').disabled = false;
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderThumbnails(blobs) {
+  const grid = document.getElementById('stamp-grid');
+  grid.innerHTML = '';
+  document.getElementById('cut-count').textContent = blobs.length + '枚';
+
+  selectedNums = new Set(blobs.map(b => parseInt(b.num)));
+
+  blobs.forEach(({ blob, num }) => {
+    const objUrl = URL.createObjectURL(blob);
+    thumbObjectURLs.push(objUrl);
+
+    const numInt = parseInt(num);
+    const kb = Math.round(blob.size / 1024);
+    const div = document.createElement('div');
+    div.className = 'stamp-thumb selected';
+    div.dataset.num = numInt;
+
+    const check = document.createElement('div');
+    check.className = 'thumb-check';
+    check.textContent = '✓';
+
+    const img = document.createElement('img');
+    img.className = 'stamp-thumb-img';
+    img.src = objUrl;
+    img.alt = `stamp_${num}`;
+
+    const label = document.createElement('div');
+    label.className = 'stamp-thumb-label';
+    label.textContent = `${num}.png (${kb}KB)`;
+
+    div.appendChild(check);
+    div.appendChild(img);
+    div.appendChild(label);
+
+    div.addEventListener('click', () => {
+      if (selectedNums.has(numInt)) {
+        selectedNums.delete(numInt);
+        div.classList.remove('selected');
+      } else {
+        selectedNums.add(numInt);
+        div.classList.add('selected');
+      }
+      updateSelectCount();
+    });
+
+    grid.appendChild(div);
+  });
+
+  updateSelectCount();
+}
+
+function updateSelectCount() {
+  const total = document.getElementById('stamp-grid').children.length;
+  document.getElementById('select-count').textContent = `${selectedNums.size} / ${total} 枚選択中`;
+  document.getElementById('btn-apng').disabled = selectedNums.size === 0;
+}
+
+document.getElementById('btn-select-all').addEventListener('click', () => {
+  document.querySelectorAll('.stamp-thumb').forEach(div => {
+    selectedNums.add(parseInt(div.dataset.num));
+    div.classList.add('selected');
+  });
+  updateSelectCount();
+});
+document.getElementById('btn-deselect-all').addEventListener('click', () => {
+  selectedNums.clear();
+  document.querySelectorAll('.stamp-thumb').forEach(div => div.classList.remove('selected'));
+  updateSelectCount();
+});
+
+document.getElementById('btn-zip').addEventListener('click', () => {
+  if (!storedZipBlob) return;
+  const url = URL.createObjectURL(storedZipBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'stamps.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ────────────────────────────────────────────
+// APNG 出力
+// ────────────────────────────────────────────
+
+// 出力サイズ選択
+document.querySelectorAll('[data-apng-size]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-apng-size]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    apngOutputSize = parseInt(btn.dataset.apngSize);
+  });
+});
+document.getElementById('apng-delay').addEventListener('input', e => {
+  document.getElementById('apng-delay-val').textContent = e.target.value + 'ms';
+});
+
+document.getElementById('btn-apng').addEventListener('click', async () => {
+  const warn = document.getElementById('apng-warning');
+  warn.style.display = 'none';
+
+  try {
+    const delay  = parseInt(document.getElementById('apng-delay').value);
+    const loops  = parseInt(document.getElementById('apng-loops').value);
+    const range  = document.querySelector('input[name="apng-range"]:checked').value;
+    const filtered = stampCells.filter(c => selectedNums.has(c.num));
+
+    if (!filtered.length) {
+      warn.style.display = 'block';
+      warn.textContent = '⚠️ フレームが選択されていません';
+      return;
+    }
+
+    const result = document.getElementById('apng-result');
+    result.style.display = 'none';
+    const oversize = [];
+    const resultLines = [];
+
+    if (range === 'all') {
+      const sz = await downloadAPNG(filtered, delay, loops, apngOutputSize, 'emoji_all.apng');
+      const sizeStr = sz >= 1024*1024 ? `${(sz/1024/1024).toFixed(2)}MB` : `${(sz/1024).toFixed(0)}KB`;
+      resultLines.push(`✅ emoji_all.apng　${filtered.length}フレーム　${sizeStr}`);
+      if (sz > 1024 * 1024) oversize.push(`emoji_all.apng (${(sz/1024/1024).toFixed(2)}MB)`);
+    } else {
+      for (let r = 0; r < rows; r++) {
+        const rowCells = filtered.filter(c => Math.floor((c.num - 1) / cols) === r);
+        if (!rowCells.length) continue;
+        const fname = `emoji_row${String(r + 1).padStart(2, '0')}.apng`;
+        if (r > 0) await sleep(120);
+        const sz = await downloadAPNG(rowCells, delay, loops, apngOutputSize, fname);
+        const sizeStr = sz >= 1024*1024 ? `${(sz/1024/1024).toFixed(2)}MB` : `${(sz/1024).toFixed(0)}KB`;
+        resultLines.push(`✅ ${fname}　${rowCells.length}フレーム　${sizeStr}`);
+        if (sz > 1024 * 1024) oversize.push(`${fname} (${(sz/1024/1024).toFixed(2)}MB)`);
+      }
+    }
+
+    result.style.display = 'block';
+    result.innerHTML = resultLines.join('<br>');
+
+    if (oversize.length) {
+      warn.style.display = 'block';
+      warn.textContent = '⚠️ 1MB を超えるファイルがあります: ' + oversize.join(' / ');
+    }
+  } catch (e) {
+    warn.style.display = 'block';
+    warn.textContent = '❌ APNG生成エラー: ' + e.message;
+  }
+});
+
+async function downloadAPNG(cells, delay, loops, size, filename) {
+  const useW = size === 0 ? cells[0].canvas.width  : size;
+  const useH = size === 0 ? cells[0].canvas.height : size;
+  const frames = [];
+  const delays = [];
+
+  for (const cell of cells) {
+    const c = resizeForAPNG(cell.canvas, useW, useH);
+    frames.push(c.getContext('2d').getImageData(0, 0, useW, useH).data.buffer.slice(0));
+    delays.push(delay);
+  }
+
+  let buf = UPNG.encode(frames, useW, useH, 0, delays);
+  if (loops !== 0) buf = patchAPNGLoops(buf, loops);
+
+  const blob = new Blob([buf], { type: 'image/png' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  return blob.size;
+}
+
+function resizeForAPNG(src, w, h) {
+  const dst = document.createElement('canvas');
+  dst.width = w; dst.height = h;
+  const ctx = dst.getContext('2d');
+  const scale = Math.min(w / src.width, h / src.height);
+  const dw = Math.round(src.width  * scale);
+  const dh = Math.round(src.height * scale);
+  ctx.drawImage(src, 0, 0, src.width, src.height,
+    Math.round((w - dw) / 2), Math.round((h - dh) / 2), dw, dh);
+  return dst;
+}
+
+// APNG の acTL チャンクにループ回数をパッチ
+const _crcTable = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c;
+  }
+  return t;
+})();
+function _crc32(u8, start, len) {
+  let c = 0xFFFFFFFF;
+  for (let i = start; i < start + len; i++) c = _crcTable[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function patchAPNGLoops(buf, loops) {
+  const u8  = new Uint8Array(buf);
+  const sig = [0x61, 0x63, 0x54, 0x4C]; // "acTL"
+  for (let i = 8; i < u8.length - 16; i++) {
+    if (u8[i]===sig[0] && u8[i+1]===sig[1] && u8[i+2]===sig[2] && u8[i+3]===sig[3]) {
+      // type(4) + num_frames(4) + num_plays(4): i〜i+11
+      const view = new DataView(buf);
+      view.setUint32(i + 8, loops);            // num_plays を上書き
+      view.setUint32(i + 12, _crc32(u8, i, 12)); // CRC を再計算
+      break;
+    }
+  }
+  return buf;
+}
+
+function canvasToBlob(c) {
+  return new Promise(resolve => c.toBlob(resolve, 'image/png'));
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function hideDone() { document.getElementById('done-banner').style.display = 'none'; }
+
+// ────────────────────────────────────────────
+// リセット
+// ────────────────────────────────────────────
+document.getElementById('btn-reset').addEventListener('click', () => {
+  originalImage = null;
+  storedZipBlob = null;
+  thumbObjectURLs.forEach(u => URL.revokeObjectURL(u));
+  thumbObjectURLs = [];
+  stampCells = [];
+  selectedNums.clear();
+  document.getElementById('select-count').textContent = '0枚選択中';
+  document.getElementById('apng-result').style.display = 'none';
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('btn-cut').disabled = true;
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('cut-preview-section').style.display = 'none';
+  document.getElementById('stamp-grid').innerHTML = '';
+  document.getElementById('apng-section').style.display = 'none';
+  document.getElementById('apng-warning').style.display = 'none';
+  document.getElementById('btn-apng').disabled = true;
+  fileInput.value = '';
+  cols = 5; rows = 8;
+  document.getElementById('input-cols').value = 5;
+  document.getElementById('input-rows').value = 8;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.preset-btn[data-col="5"]').classList.add('active');
+});
+</script>
+</body>
+</html>
