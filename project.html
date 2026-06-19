@@ -257,7 +257,8 @@ const PROJECTS = {
     title: "LINE スタンプ カッター",
     desc: "一枚のシート画像から最大40個のスタンプ・絵文字を自動切り出しできるWebアプリ。背景色の透過、グリッド分割ラインのドラッグ調整、APNGアニメーション出力にも対応。Claude AI を使って開発。",
     tags: [["Claude AI","tag-blue"],["Web アプリ","tag-mint"]],
-    link: { label: "▶ アプリを開く", url: "stamp-cutter.html" }
+    link: { label: "▶ アプリを開く", url: "stamp-cutter.html" },
+    related: [{ id: "line-stamps", note: "企画で生成した画像をこのツールで仕上げ" }]
   },
   "work-report": {
     title: "作業報告テンプレート作成ツール",
@@ -309,7 +310,8 @@ const PROJECTS = {
   "line-stamps": {
     title: "LINE スタンプ・絵文字 企画",
     desc: "スタンプ用の画像生成とアニメーション絵文字の構成案を含む、LINE クリエイター向けの制作企画。",
-    tags: [["LINE","tag-mint"],["スタンプ","tag-pink"]]
+    tags: [["LINE","tag-mint"],["スタンプ","tag-pink"]],
+    related: [{ id: "stamp-cutter", note: "ここで生成した画像をカッターで仕上げ" }]
   },
   "waist-dart": {
     title: "シャツへのウエストダーツ加工",
