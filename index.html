@@ -62,6 +62,9 @@
     max-width: 760px; margin: 0 auto;
     padding: 56px 24px 40px;
     text-align: center;
+    background: white;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 20px rgba(150,190,200,0.12);
   }
   .hero-eyebrow {
     font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
@@ -112,9 +115,12 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px;
   }
-  .grid-wide {
-    grid-template-columns: 1fr;
+
+  /* ── カードリンク ── */
+  .card-link {
+    text-decoration: none; color: inherit; display: block;
   }
+  .card-link:hover .card { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(130,180,190,0.28); }
 
   /* ── カード ── */
   .card {
@@ -126,13 +132,13 @@
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex; flex-direction: column;
+    height: 100%;
   }
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 32px rgba(130,180,190,0.28);
-  }
+
+  /* ── サムネイル ── */
   .card-thumb {
     width: 100%; aspect-ratio: 16/9;
+    position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
     font-size: 40px;
     background: linear-gradient(135deg, var(--mint-l), var(--blue-l));
@@ -140,6 +146,22 @@
   .card-thumb.pink  { background: linear-gradient(135deg, var(--pink-l), var(--purple-l)); }
   .card-thumb.sage  { background: linear-gradient(135deg, #e8f5e9, #f1f8f5); }
   .card-thumb.sky   { background: linear-gradient(135deg, var(--blue-l), #e8f4ff); }
+  .card-thumb img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-thumb .thumb-hint {
+    position: absolute; bottom: 6px; right: 8px;
+    font-size: 10px; color: rgba(255,255,255,0.8);
+    background: rgba(0,0,0,0.2); padding: 2px 7px;
+    border-radius: 10px; opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .card-link:hover .card-thumb .thumb-hint { opacity: 1; }
+
   .card-body {
     padding: 16px 18px 18px;
     flex: 1; display: flex; flex-direction: column;
@@ -174,36 +196,6 @@
   }
   .btn-outline:hover { background: var(--mint-l); }
 
-  /* ── ワイドカード（横並び） ── */
-  .card-wide {
-    flex-direction: row; align-items: stretch;
-  }
-  .card-wide .card-thumb {
-    width: 140px; flex-shrink: 0; aspect-ratio: auto;
-    border-radius: 0;
-  }
-  @media (max-width: 520px) {
-    .card-wide { flex-direction: column; }
-    .card-wide .card-thumb { width: 100%; aspect-ratio: 16/9; }
-  }
-
-  /* ── これからやること ── */
-  .future-list {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .future-item {
-    background: var(--card-bg);
-    backdrop-filter: blur(4px);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(255,255,255,0.6);
-    padding: 13px 18px;
-    display: flex; align-items: flex-start; gap: 10px;
-    box-shadow: 0 2px 10px rgba(150,190,200,0.12);
-  }
-  .future-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-  .future-text h4 { font-size: 13px; font-weight: 700; color: #5a6e8a; margin-bottom: 2px; }
-  .future-text p  { font-size: 11.5px; color: var(--text-s); }
-
   /* ── フッター ── */
   footer {
     text-align: center;
@@ -229,20 +221,19 @@
     <li><a href="#tools">ツール</a></li>
     <li><a href="#design">デザイン</a></li>
     <li><a href="#making">ものづくり</a></li>
-    <li><a href="#future">これから</a></li>
   </ul>
 </nav>
 
 <!-- ヒーロー -->
 <div class="hero">
-  <p class="hero-eyebrow">Portfolio — 2025 ✦</p>
+  <p class="hero-eyebrow">Portfolio — 2026 ✦</p>
   <h1>最近作ったもの<br>まとめ</h1>
   <p>ツール開発・イラスト・服づくりなど、<br>最近取り組んできたことのまとめです。</p>
   <div class="hero-tags">
+    <span class="tag tag-blue">🌿 AI活用</span>
     <span class="tag tag-mint">🛠 ツール開発</span>
     <span class="tag tag-pink">🌸 イラスト・デザイン</span>
     <span class="tag tag-purple">✂️ ものづくり</span>
-    <span class="tag tag-blue">🌿 AI活用</span>
   </div>
 </div>
 
@@ -254,8 +245,13 @@
   </div>
   <div class="grid">
 
+    <a href="project.html?id=stamp-cutter" class="card-link">
     <div class="card">
-      <div class="card-thumb">🖼️</div>
+      <div class="card-thumb">
+        <span>🖼️</span>
+        <img src="images/stamp-cutter.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">Claude AI</span>
@@ -264,13 +260,19 @@
         <h3>LINE スタンプ カッター</h3>
         <p>一枚のシート画像から最大40個のスタンプ・絵文字を自動切り出し。APNG アニメーション出力にも対応。</p>
         <div class="card-footer">
-          <a class="btn-link btn-primary" href="stamp-cutter.html">▶ 開く</a>
+          <span class="btn-link btn-primary" onclick="event.preventDefault();window.location='stamp-cutter.html'">▶ 開く</span>
         </div>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=work-report" class="card-link">
     <div class="card">
-      <div class="card-thumb sky">📋</div>
+      <div class="card-thumb sky">
+        <span>📋</span>
+        <img src="images/work-report.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">Claude AI</span>
@@ -280,9 +282,15 @@
         <p>スプレッドシートの作業管理システムと連携し、報告テンプレートを自動生成するツール。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=tab-duplicate" class="card-link">
     <div class="card">
-      <div class="card-thumb pink">🗂️</div>
+      <div class="card-thumb pink">
+        <span>🗂️</span>
+        <img src="images/tab-duplicate.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">Claude AI</span>
@@ -292,9 +300,15 @@
         <p>現在のタブをワンクリックで複製できるブラウザ向けアプリ。単純な操作の繰り返しをなくす。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=spreadsheet" class="card-link">
     <div class="card">
-      <div class="card-thumb sage">📊</div>
+      <div class="card-thumb sage">
+        <span>📊</span>
+        <img src="images/spreadsheet.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-mint">スプレッドシート</span>
@@ -303,9 +317,15 @@
         <p>タスクの進捗・優先度・担当を一元管理するスプレッドシートベースの作業管理システム。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=autoclicker" class="card-link">
     <div class="card">
-      <div class="card-thumb">🖱️</div>
+      <div class="card-thumb">
+        <span>🖱️</span>
+        <img src="images/autoclicker.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-purple">AutoHotkey</span>
@@ -317,6 +337,7 @@
         </div>
       </div>
     </div>
+    </a>
 
   </div>
 </section>
@@ -329,8 +350,13 @@
   </div>
   <div class="grid">
 
+    <a href="project.html?id=waist-tuck-design" class="card-link">
     <div class="card">
-      <div class="card-thumb pink">👚</div>
+      <div class="card-thumb pink">
+        <span>👚</span>
+        <img src="images/waist-tuck-design.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-pink">AI生成</span>
@@ -340,9 +366,15 @@
         <p>自作版と AI 生成版を並べた着用イメージ比較。SNS 掲載・紹介文の素材として制作。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=stole-cardigan-design" class="card-link">
     <div class="card">
-      <div class="card-thumb pink">🧣</div>
+      <div class="card-thumb pink">
+        <span>🧣</span>
+        <img src="images/stole-cardigan-design.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-pink">AI生成</span>
@@ -352,9 +384,15 @@
         <p>モデルを統一したカラー・柄違いの着用イメージ画像。素材のバリエーション展示用。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=japanese-garden" class="card-link">
     <div class="card">
-      <div class="card-thumb sky">🏯</div>
+      <div class="card-thumb sky">
+        <span>🏯</span>
+        <img src="images/japanese-garden.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">AI生成</span>
@@ -364,9 +402,15 @@
         <p>縁側あり・桜演出・花びら散らしの3バリエーション。LINEスタンプや動画背景用。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=sakura-fantasy" class="card-link">
     <div class="card">
-      <div class="card-thumb pink">🌸</div>
+      <div class="card-thumb pink">
+        <span>🌸</span>
+        <img src="images/sakura-fantasy.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-pink">AI生成</span>
@@ -376,9 +420,15 @@
         <p>儚さを重視した幻想的な桜の背景と、動画化を意識した演出版の2バリエーション。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=ink-motion" class="card-link">
     <div class="card">
-      <div class="card-thumb sky">🌊</div>
+      <div class="card-thumb sky">
+        <span>🌊</span>
+        <img src="images/ink-motion.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">AI生成</span>
@@ -388,9 +438,15 @@
         <p>幻想的なインク広がりをテーマにした背景動画案と、桜が舞う演出の動画素材。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=line-stamps" class="card-link">
     <div class="card">
-      <div class="card-thumb">💬</div>
+      <div class="card-thumb">
+        <span>💬</span>
+        <img src="images/line-stamps.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-mint">LINE</span>
@@ -400,6 +456,7 @@
         <p>スタンプ用の画像生成とアニメーション絵文字の構成案を含む、LINE クリエイター向けの制作企画。</p>
       </div>
     </div>
+    </a>
 
   </div>
 </section>
@@ -412,8 +469,13 @@
   </div>
   <div class="grid">
 
+    <a href="project.html?id=waist-dart" class="card-link">
     <div class="card">
-      <div class="card-thumb sage">👔</div>
+      <div class="card-thumb sage">
+        <span>👔</span>
+        <img src="images/waist-dart.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-mint">ソーイング</span>
@@ -423,9 +485,15 @@
         <p>既製シャツにウエストダーツを入れてウエストタックシャツに仕立て直す加工。シルエットをすっきりさせる。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=stole-cardigan-making" class="card-link">
     <div class="card">
-      <div class="card-thumb sage">🧶</div>
+      <div class="card-thumb sage">
+        <span>🧶</span>
+        <img src="images/stole-cardigan-making.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-mint">ソーイング</span>
@@ -435,6 +503,7 @@
         <p>型紙を改良し、フィンガーホール搭載でコートとして着られるストールカーディガンを制作。次はウォッチホール追加を検討中。</p>
       </div>
     </div>
+    </a>
 
   </div>
 </section>
@@ -447,8 +516,13 @@
   </div>
   <div class="grid">
 
+    <a href="project.html?id=sns-hobby" class="card-link">
     <div class="card">
-      <div class="card-thumb pink">✍️</div>
+      <div class="card-thumb pink">
+        <span>✍️</span>
+        <img src="images/sns-hobby.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-pink">SNS</span>
@@ -457,9 +531,15 @@
         <p>近況報告・趣味について自然な文体でまとめた SNS 投稿用テキスト。</p>
       </div>
     </div>
+    </a>
 
+    <a href="project.html?id=waist-tuck-text" class="card-link">
     <div class="card">
-      <div class="card-thumb sky">📣</div>
+      <div class="card-thumb sky">
+        <span>📣</span>
+        <img src="images/waist-tuck-text.jpg" onerror="this.remove()" alt="">
+        <span class="thumb-hint">詳細を見る →</span>
+      </div>
       <div class="card-body">
         <div class="card-tags">
           <span class="tag tag-blue">SNS</span>
@@ -469,47 +549,13 @@
         <p>おしゃれ寄せ版と SNS 掲載向けの2バリエーション。商品・作品をより魅力的に伝える文章。</p>
       </div>
     </div>
-
-  </div>
-</section>
-
-<!-- これからやりたいこと -->
-<section id="future">
-  <div class="section-header">
-    <h2>🌱 これからやりたいこと</h2>
-    <div class="section-divider"></div>
-  </div>
-  <div class="future-list">
-
-    <div class="future-item">
-      <div class="future-icon">⌚</div>
-      <div class="future-text">
-        <h4>ストールカーディガンにウォッチホール追加</h4>
-        <p>長袖をまくらず時計が確認できるウォッチホールを袖に搭載する改良を検討中。</p>
-      </div>
-    </div>
-
-    <div class="future-item">
-      <div class="future-icon">🎬</div>
-      <div class="future-text">
-        <h4>生成画像を動画として動かす表現への挑戦</h4>
-        <p>AI 生成した静止画にモーションをつけ、動画コンテンツとして仕上げる表現を試みる。</p>
-      </div>
-    </div>
-
-    <div class="future-item">
-      <div class="future-icon">🖱️</div>
-      <div class="future-text">
-        <h4>自動クリック（連打）ツール開発への再挑戦</h4>
-        <p>前回うまくいかなかった自動クリックツールを改善・再開発する。</p>
-      </div>
-    </div>
+    </a>
 
   </div>
 </section>
 
 <footer>
-  ✦ ユイカ のポートフォリオ &nbsp;|&nbsp; 2025
+  ✦ ポートフォリオ &nbsp;|&nbsp; 2026
 </footer>
 
 </body>

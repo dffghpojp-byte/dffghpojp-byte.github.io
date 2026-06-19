@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>プロジェクト詳細</title>
+<style>
+  :root {
+    --mint:   #6cbfab;
+    --mint-l: #d4f5ea;
+    --blue-l: #e0f2fb;
+    --pink:   #d87aaa;
+    --pink-l: #fbe8f2;
+    --purple-l: #ece4fb;
+    --text:   #4a5a5a;
+    --text-s: #8a9494;
+    --bg: linear-gradient(160deg, #e8f7f2 0%, #eaf3fb 35%, #f3edfb 70%, #fdf0f5 100%);
+    --radius: 18px;
+    --radius-sm: 10px;
+    --shadow: 0 6px 24px rgba(150,190,200,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    background-attachment: fixed;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(180,220,210,0.3);
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 12px;
+    height: 52px;
+  }
+  .back-btn {
+    font-size: 13px; font-weight: 700; color: var(--mint);
+    text-decoration: none; padding: 5px 12px;
+    border-radius: 20px; background: var(--mint-l);
+    transition: opacity 0.15s;
+  }
+  .back-btn:hover { opacity: 0.75; }
+  .nav-title {
+    font-size: 13px; color: var(--text-s); font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .container {
+    max-width: 720px; margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── ヘッダー ── */
+  .proj-header {
+    background: rgba(255,255,255,0.88);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .proj-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+  }
+  .tag {
+    font-size: 11px; font-weight: 700;
+    padding: 4px 13px; border-radius: 20px;
+  }
+  .tag-mint   { background: var(--mint-l); color: #47998a; }
+  .tag-pink   { background: var(--pink-l); color: var(--pink); }
+  .tag-purple { background: var(--purple-l); color: #8b6ec4; }
+  .tag-blue   { background: var(--blue-l); color: #5a99bb; }
+  .proj-title {
+    font-size: 24px; font-weight: 800; color: #5a6e8a;
+    line-height: 1.3; margin-bottom: 10px;
+  }
+  .proj-desc {
+    font-size: 14px; color: var(--text-s); line-height: 1.8;
+  }
+  .proj-link-row {
+    margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .btn {
+    font-size: 12px; font-weight: 700;
+    padding: 7px 18px; border-radius: 20px; text-decoration: none;
+    border: 1.5px solid transparent; transition: all 0.15s;
+    display: inline-block;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--mint), #5aabbc);
+    color: white;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* ── 画像ギャラリー ── */
+  .section-title {
+    font-size: 13px; font-weight: 800; color: var(--text-s);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 12px; margin-top: 24px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(150,200,190,0.4), transparent);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .gallery-item {
+    position: relative; border-radius: var(--radius-sm);
+    overflow: hidden; background: rgba(255,255,255,0.6);
+    border: 2px dashed rgba(150,200,190,0.4);
+    aspect-ratio: 4/3;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  }
+  .gallery-item:hover { border-color: var(--mint); background: var(--mint-l); }
+  .gallery-item.has-image { border-style: solid; border-color: rgba(255,255,255,0.6); }
+  .gallery-item img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .gallery-item input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+  }
+  .gallery-placeholder {
+    text-align: center; pointer-events: none;
+  }
+  .gallery-placeholder .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+  .gallery-placeholder p { font-size: 11px; color: var(--text-s); }
+  .gallery-del {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(255,255,255,0.85); border: none;
+    border-radius: 50%; width: 24px; height: 24px;
+    font-size: 14px; cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    z-index: 2;
+  }
+  .gallery-item.has-image .gallery-del { display: flex; }
+  .gallery-del:hover { background: #fce; }
+
+  .add-image-btn {
+    width: 100%; padding: 12px;
+    border: 2px dashed rgba(150,200,190,0.5);
+    border-radius: var(--radius-sm);
+    background: transparent; cursor: pointer;
+    font-size: 12px; font-weight: 700; color: var(--mint);
+    transition: all 0.15s; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .add-image-btn:hover { background: var(--mint-l); border-color: var(--mint); }
+
+  /* ── メモ ── */
+  .memo-box {
+    background: rgba(255,255,255,0.88);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 24px 28px;
+    margin-top: 16px;
+  }
+  .memo-area {
+    width: 100%; min-height: 140px;
+    border: 1.5px solid rgba(150,200,190,0.3);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-family: inherit; font-size: 13px; color: var(--text);
+    line-height: 1.8; resize: vertical;
+    background: rgba(255,255,255,0.7);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .memo-area:focus { border-color: var(--mint); }
+  .memo-saved {
+    font-size: 11px; color: var(--mint); margin-top: 6px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .memo-saved.show { opacity: 1; }
+
+  .save-notice {
+    font-size: 11px; color: var(--text-s);
+    background: var(--blue-l); border-radius: 8px;
+    padding: 8px 14px; margin-top: 12px; line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 20px 16px 60px; }
+    .proj-header { padding: 20px 20px; }
+    .gallery { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="back-btn" href="index.html">← 一覧に戻る</a>
+  <span class="nav-title" id="nav-title"></span>
+</nav>
+
+<div class="container">
+  <div class="proj-header">
+    <div class="proj-tags" id="proj-tags"></div>
+    <h1 class="proj-title" id="proj-title">読み込み中…</h1>
+    <p class="proj-desc" id="proj-desc"></p>
+    <div class="proj-link-row" id="proj-links"></div>
+  </div>
+
+  <div class="memo-box">
+    <p class="section-title">📷 画像</p>
+    <div class="gallery" id="gallery"></div>
+    <button class="add-image-btn" id="add-image-btn">＋ 画像を追加</button>
+    <p class="save-notice">💡 画像はこのブラウザに保存されます。GitHub に公開するには <code>images/</code> フォルダに追加してください。</p>
+  </div>
+
+  <div class="memo-box" style="margin-top:16px;">
+    <p class="section-title">📝 メモ・詳細テキスト</p>
+    <textarea class="memo-area" id="memo-area" placeholder="制作過程・こだわり・使用ツールなど、自由に書いてください…"></textarea>
+    <p class="memo-saved" id="memo-saved">✓ 保存しました</p>
+    <p class="save-notice">💡 メモはこのブラウザに自動保存されます。</p>
+  </div>
+</div>
+
+<script>
+const PROJECTS = {
+  "stamp-cutter": {
+    title: "LINE スタンプ カッター",
+    desc: "一枚のシート画像から最大40個のスタンプ・絵文字を自動切り出しできるWebアプリ。背景色の透過、グリッド分割ラインのドラッグ調整、APNGアニメーション出力にも対応。Claude AI を使って開発。",
+    tags: [["Claude AI","tag-blue"],["Web アプリ","tag-mint"]],
+    link: { label: "▶ アプリを開く", url: "stamp-cutter.html" }
+  },
+  "work-report": {
+    title: "作業報告テンプレート作成ツール",
+    desc: "スプレッドシートの作業管理システムと連携し、報告テンプレートを自動生成するツール。Claude AI を使って開発。",
+    tags: [["Claude AI","tag-blue"],["スプレッドシート連携","tag-purple"]]
+  },
+  "tab-duplicate": {
+    title: "ブラウザタブ複製ボタン",
+    desc: "現在のタブをワンクリックで複製できるブラウザ向けアプリ。単純な操作の繰り返しをなくすために Claude AI を使って開発。",
+    tags: [["Claude AI","tag-blue"],["ブラウザ","tag-pink"]]
+  },
+  "spreadsheet": {
+    title: "スプレッドシート作業管理システム",
+    desc: "タスクの進捗・優先度・担当を一元管理するスプレッドシートベースの作業管理システム。",
+    tags: [["スプレッドシート","tag-mint"]]
+  },
+  "autoclicker": {
+    title: "自動クリック（連打）ツール",
+    desc: "AutoHotkey を使った自動連打ツール。改良版の開発に再挑戦中。",
+    tags: [["AutoHotkey","tag-purple"],["🔧 開発中","tag-blue"]]
+  },
+  "waist-tuck-design": {
+    title: "ウエストタックシャツ 比較画像",
+    desc: "自作版と AI 生成版を並べた着用イメージ比較。SNS 掲載・紹介文の素材として制作。",
+    tags: [["AI生成","tag-pink"],["比較画像","tag-purple"]]
+  },
+  "stole-cardigan-design": {
+    title: "ストールカーディガン 着用イメージ",
+    desc: "モデルを統一したカラー・柄違いの着用イメージ画像。素材のバリエーション展示用。",
+    tags: [["AI生成","tag-pink"],["カラー調整","tag-mint"]]
+  },
+  "japanese-garden": {
+    title: "和風庭園 背景素材",
+    desc: "縁側あり・桜演出・花びら散らしの3バリエーション。LINEスタンプや動画背景用に制作した AI 生成背景素材。",
+    tags: [["AI生成","tag-blue"],["背景素材","tag-mint"]]
+  },
+  "sakura-fantasy": {
+    title: "桜の幻想背景",
+    desc: "儚さを重視した幻想的な桜の背景と、動画化を意識した演出版の2バリエーション。",
+    tags: [["AI生成","tag-pink"],["幻想系","tag-purple"]]
+  },
+  "ink-motion": {
+    title: "インクモーション 背景素材",
+    desc: "幻想的なインク広がりをテーマにした背景動画案と、桜が舞う演出の動画素材。",
+    tags: [["AI生成","tag-blue"],["動画素材","tag-purple"]]
+  },
+  "line-stamps": {
+    title: "LINE スタンプ・絵文字 企画",
+    desc: "スタンプ用の画像生成とアニメーション絵文字の構成案を含む、LINE クリエイター向けの制作企画。",
+    tags: [["LINE","tag-mint"],["スタンプ","tag-pink"]]
+  },
+  "waist-dart": {
+    title: "シャツへのウエストダーツ加工",
+    desc: "既製シャツにウエストダーツを入れてウエストタックシャツに仕立て直す加工。シルエットをすっきりさせる。",
+    tags: [["ソーイング","tag-mint"],["リメイク","tag-blue"]]
+  },
+  "stole-cardigan-making": {
+    title: "ストールカーディガン 制作",
+    desc: "型紙を改良し、フィンガーホール搭載でコートとして着られるストールカーディガンを制作。次はウォッチホール追加を検討中。",
+    tags: [["ソーイング","tag-mint"],["型紙改良","tag-purple"]]
+  },
+  "sns-hobby": {
+    title: "「最近ハマっていること」投稿文",
+    desc: "近況報告・趣味について自然な文体でまとめた SNS 投稿用テキスト。",
+    tags: [["SNS","tag-pink"]]
+  },
+  "waist-tuck-text": {
+    title: "ウエストタック シャツ紹介文",
+    desc: "おしゃれ寄せ版と SNS 掲載向けの2バリエーション。商品・作品をより魅力的に伝える文章。",
+    tags: [["SNS","tag-blue"],["紹介文","tag-mint"]]
+  }
+};
+
+// URLからIDを取得
+const params = new URLSearchParams(location.search);
+const id = params.get("id") || "";
+const proj = PROJECTS[id];
+
+if (proj) {
+  document.title = proj.title + " — ポートフォリオ";
+  document.getElementById("nav-title").textContent = proj.title;
+  document.getElementById("proj-title").textContent = proj.title;
+  document.getElementById("proj-desc").textContent = proj.desc;
+
+  const tagsEl = document.getElementById("proj-tags");
+  proj.tags.forEach(([label, cls]) => {
+    const s = document.createElement("span");
+    s.className = "tag " + cls;
+    s.textContent = label;
+    tagsEl.appendChild(s);
+  });
+
+  if (proj.link) {
+    const row = document.getElementById("proj-links");
+    const a = document.createElement("a");
+    a.href = proj.link.url;
+    a.className = "btn btn-primary";
+    a.textContent = proj.link.label;
+    row.appendChild(a);
+  }
+}
+
+// ── 画像ギャラリー（localStorage） ──
+const STORAGE_KEY = "proj_images_" + id;
+let images = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+const gallery = document.getElementById("gallery");
+
+function renderGallery() {
+  gallery.innerHTML = "";
+  images.forEach((dataUrl, i) => {
+    const item = document.createElement("div");
+    item.className = "gallery-item has-image";
+
+    const img = document.createElement("img");
+    img.src = dataUrl;
+    img.alt = "画像 " + (i+1);
+
+    const del = document.createElement("button");
+    del.className = "gallery-del";
+    del.textContent = "✕";
+    del.onclick = (e) => { e.stopPropagation(); images.splice(i, 1); save(); renderGallery(); };
+
+    item.appendChild(img);
+    item.appendChild(del);
+    gallery.appendChild(item);
+  });
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
+}
+
+document.getElementById("add-image-btn").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.onchange = () => {
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => { images.push(e.target.result); save(); renderGallery(); };
+      reader.readAsDataURL(file);
+    });
+  };
+  input.click();
+});
+
+renderGallery();
+
+// ── メモ（localStorage） ──
+const MEMO_KEY = "proj_memo_" + id;
+const memoArea = document.getElementById("memo-area");
+const memoSaved = document.getElementById("memo-saved");
+
+memoArea.value = localStorage.getItem(MEMO_KEY) || "";
+
+let saveTimer;
+memoArea.addEventListener("input", () => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(MEMO_KEY, memoArea.value);
+    memoSaved.classList.add("show");
+    setTimeout(() => memoSaved.classList.remove("show"), 1500);
+  }, 600);
+});
+</script>
+</body>
+</html>
