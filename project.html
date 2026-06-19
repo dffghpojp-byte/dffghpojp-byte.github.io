@@ -222,9 +222,7 @@
 
 <div class="container">
   <div class="proj-header">
-    <div id="proj-hero-img" style="display:none; margin-bottom:18px; border-radius:12px; overflow:hidden;">
-      <img id="proj-hero-img-el" src="" alt="" style="width:100%; display:block;">
-    </div>
+    <div id="proj-gallery-static" style="margin-bottom:18px;"></div>
     <div class="proj-tags" id="proj-tags"></div>
     <h1 class="proj-title" id="proj-title">読み込み中…</h1>
     <p class="proj-desc" id="proj-desc"></p>
@@ -356,16 +354,42 @@ if (proj) {
     tagsEl.appendChild(s);
   });
 
-  // メイン画像（images/フォルダから）
-  const heroImg = document.getElementById("proj-hero-img");
-  const heroImgEl = document.getElementById("proj-hero-img-el");
-  heroImgEl.src = "images/" + id + ".jpg";
-  heroImgEl.onload = () => { heroImg.style.display = "block"; };
-  heroImgEl.onerror = () => {
-    heroImgEl.src = "images/" + id + ".png";
-    heroImgEl.onload = () => { heroImg.style.display = "block"; };
-    heroImgEl.onerror = () => {};
-  };
+  // 複数画像ギャラリー（images/フォルダから）
+  const staticGallery = document.getElementById("proj-gallery-static");
+  const candidates = [
+    "images/" + id + ".jpg",
+    "images/" + id + ".png",
+    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".jpg"),
+    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".png"),
+  ];
+  let loadedCount = 0;
+  candidates.forEach(src => {
+    const img = new Image();
+    img.onload = () => {
+      loadedCount++;
+      const wrap = document.createElement("div");
+      wrap.style.cssText = loadedCount === 1
+        ? "border-radius:12px; overflow:hidden; margin-bottom:10px;"
+        : "border-radius:12px; overflow:hidden;";
+      const el = document.createElement("img");
+      el.src = src;
+      el.alt = "";
+      el.style.cssText = "width:100%; display:block;";
+      wrap.appendChild(el);
+      if (loadedCount === 1) {
+        staticGallery.insertBefore(wrap, staticGallery.firstChild);
+      } else {
+        if (loadedCount === 2) {
+          const grid = document.createElement("div");
+          grid.id = "static-grid";
+          grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;";
+          staticGallery.appendChild(grid);
+        }
+        document.getElementById("static-grid").appendChild(wrap);
+      }
+    };
+    img.src = src;
+  });
 
   if (proj.link) {
     const row = document.getElementById("proj-links");
