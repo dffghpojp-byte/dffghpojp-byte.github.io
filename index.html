@@ -42,9 +42,10 @@
     display: flex; align-items: center; justify-content: space-between;
     height: 52px;
   }
-  .nav-logo {
-    font-size: 15px; font-weight: 800; color: var(--mint);
-    letter-spacing: 0.06em; text-decoration: none;
+  .nav-logo img {
+    height: 36px;
+    width: auto;
+    display: block;
   }
   .nav-links {
     display: flex; gap: 6px; list-style: none;
@@ -221,6 +222,7 @@
 <body>
 
 <nav>
+  <a href="#" class="nav-logo"><img src="images/logo.png" alt="Yuika"></a>
   <ul class="nav-links">
     <li><a href="#tools">ツール</a></li>
     <li><a href="#design">デザイン</a></li>
