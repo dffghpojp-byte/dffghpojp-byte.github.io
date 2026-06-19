@@ -222,6 +222,9 @@
 
 <div class="container">
   <div class="proj-header">
+    <div id="proj-hero-img" style="display:none; margin-bottom:18px; border-radius:12px; overflow:hidden;">
+      <img id="proj-hero-img-el" src="" alt="" style="width:100%; max-height:360px; object-fit:cover; display:block;">
+    </div>
     <div class="proj-tags" id="proj-tags"></div>
     <h1 class="proj-title" id="proj-title">読み込み中…</h1>
     <p class="proj-desc" id="proj-desc"></p>
@@ -343,6 +346,17 @@ if (proj) {
     s.textContent = label;
     tagsEl.appendChild(s);
   });
+
+  // メイン画像（images/フォルダから）
+  const heroImg = document.getElementById("proj-hero-img");
+  const heroImgEl = document.getElementById("proj-hero-img-el");
+  heroImgEl.src = "images/" + id + ".jpg";
+  heroImgEl.onload = () => { heroImg.style.display = "block"; };
+  heroImgEl.onerror = () => {
+    heroImgEl.src = "images/" + id + ".png";
+    heroImgEl.onload = () => { heroImg.style.display = "block"; };
+    heroImgEl.onerror = () => {};
+  };
 
   if (proj.link) {
     const row = document.getElementById("proj-links");
