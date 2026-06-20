@@ -275,10 +275,17 @@ const PROJECTS = {
     desc: "タスクの進捗・優先度・担当を一元管理するスプレッドシートベースの作業管理システム。",
     tags: [["スプレッドシート","tag-mint"]]
   },
+  "winhero-auto": {
+    title: "WIND BREAKER イベント自動周回",
+    desc: "モバイルゲーム「WIND BREAKER」のイベントバトルを自動周回するツール。BlueStacks版はADB経由でAndroid内のゲームに直接タップを送信し、クリックアシスタントアプリを不要に。Steam PC版はAutoHotkeyでウィンドウ座標を変換してクリック操作を自動化。どちらもクラッシュ監視・スリープ防止機能付き。座標取得用のCoordPickerツールも同時に開発。",
+    tags: [["Claude AI","tag-blue"],["AutoHotkey","tag-mint"],["ADB","tag-purple"]],
+    related: [{ id: "autoclicker", note: "元になったオートクリッカー" }]
+  },
   "autoclicker": {
     title: "自動クリック（連打）ツール",
     desc: "AutoHotkey を使った自動連打ツール。改良版の開発に再挑戦中。",
-    tags: [["AutoHotkey","tag-purple"],["🔧 開発中","tag-blue"]]
+    tags: [["AutoHotkey","tag-purple"],["🔧 開発中","tag-blue"]],
+    related: [{ id: "winhero-auto", note: "このツールを発展させた自動周回ツール" }]
   },
   "waist-tuck-design": {
     title: "ウエストタックシャツ 比較画像",
