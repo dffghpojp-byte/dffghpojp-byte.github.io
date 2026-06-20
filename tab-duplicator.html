@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>タブ複製ツール</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    color: #4a5a5a;
+    background: linear-gradient(160deg, #e8f7f2 0%, #eaf3fb 35%, #f3edfb 70%, #fdf0f5 100%);
+    line-height: 1.8;
+    padding: 40px 16px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 460px; margin: 0 auto;
+  }
+
+  .subtitle {
+    font-size: 11px; color: #8fb8ad; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 4px; font-weight: 700;
+  }
+  h1 {
+    font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #4a5a5a;
+  }
+  .desc {
+    font-size: 12.5px; color: #7a8888; margin-bottom: 24px;
+  }
+
+  .mock-note {
+    font-size: 11px; color: #b08a9a;
+    background: rgba(251,234,240,0.7);
+    border: 1px solid #f5d8e4;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(150,190,200,0.15);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+  .card-label {
+    font-size: 13px; font-weight: 700; color: #4a5a5a;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+  }
+  .card-label::before {
+    content: "●"; color: #8fb8ad; font-size: 8px;
+  }
+
+  label {
+    font-size: 12px; color: #8a9494; display: block; margin-bottom: 6px;
+  }
+  input[type="text"] {
+    width: 100%;
+    border: 1px solid #dce8e4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #4a5a5a;
+    background: #fbfdfc;
+    margin-bottom: 14px;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #8fb8ad;
+  }
+
+  .count-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+  }
+  .count-row input { width: 70px; margin-bottom: 0; }
+  .count-row span { font-size: 13px; color: #7a8888; }
+
+  button.primary {
+    width: 100%;
+    background: linear-gradient(90deg, #6fc3b0, #5fa8d8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 0;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  .note {
+    font-size: 10.5px; color: #a8b8b4; margin-top: 10px; text-align: center;
+  }
+
+  .empty {
+    font-size: 12px; color: #b0bcb8; margin-bottom: 12px;
+  }
+  .add-row { display: flex; gap: 8px; }
+  .add-row input { margin-bottom: 0; flex: 1; }
+  button.add {
+    background: linear-gradient(90deg, #d4f5ea, #e0f2fb);
+    color: #0c5c47;
+    border: none;
+    border-radius: 10px;
+    padding: 0 18px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .footer {
+    margin-top: 24px; text-align: center;
+    font-size: 10.5px; color: #a8c4c0; letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <p class="subtitle">Tool 🛠</p>
+  <h1>タブ複製ツール</h1>
+  <p class="desc">指定したURLを好きな数だけ新しいタブで一括オープン。Claude AIで作成した個人用ツールです。</p>
+  <p class="mock-note">※これは実物のUIに近づけたモックです。表示のみで実際の動作はしません。</p>
+
+  <div class="card">
+    <p class="card-label">URLを指定した数だけ開く</p>
+
+    <label>URL</label>
+    <input type="text" placeholder="https://...">
+
+    <label>タブ数</label>
+    <div class="count-row">
+      <input type="text" value="10">
+      <span>個</span>
+    </div>
+
+    <button class="primary">タブを開く</button>
+    <p class="note">※初回はブラウザのポップアップ許可が必要です</p>
+  </div>
+
+  <div class="card">
+    <p class="card-label">登録URL（タップでURL欄にセット）</p>
+    <p class="empty">登録URLがありません</p>
+    <div class="add-row">
+      <input type="text" placeholder="URLを入力...">
+      <button class="add">追加</button>
+    </div>
+  </div>
+
+  <div class="footer">🌊 Portfolio — タブ複製ツール 🌊</div>
+
+</div>
+</body>
+</html>

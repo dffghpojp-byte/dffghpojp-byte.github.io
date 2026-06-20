@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>LINE報告テンプレ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    color: #4a5a5a;
+    background: linear-gradient(160deg, #e8f7f2 0%, #eaf3fb 35%, #f3edfb 70%, #fdf0f5 100%);
+    line-height: 1.7;
+    padding: 24px 14px;
+    min-height: 100vh;
+  }
+  .container { max-width: 420px; margin: 0 auto; }
+
+  .app-card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(150,190,200,0.18);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+
+  .header {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid #eef0ec;
+  }
+  .header-title { font-size: 14px; font-weight: 700; color: #4a5a5a; display: flex; align-items: center; gap: 6px; }
+  .header-sub { font-size: 10.5px; color: #9bb0ac; margin-top: 2px; }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #eef0ec;
+  }
+  .tab {
+    flex: 1; text-align: center; padding: 10px 2px;
+    font-size: 10.5px; color: #9aa6a4; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab i { display: block; font-size: 16px; margin-bottom: 3px; }
+  .tab.active { color: #3a4a4a; font-weight: 700; border-bottom-color: #3a4a4a; }
+  .tab .dot-start { color: #5fae7d; }
+  .tab .dot-end { color: #d4607a; }
+
+  .panel { display: none; padding: 18px; }
+  .panel.active { display: block; }
+
+  .empty-panel {
+    padding: 60px 20px; text-align: center; color: #b8c4c0; font-size: 12.5px;
+  }
+  .empty-panel i { font-size: 32px; display: block; margin: 0 auto 10px; color: #d4e0dc; }
+
+  .seg {
+    display: flex; gap: 6px; margin-bottom: 18px;
+  }
+  .seg-btn {
+    flex: 1; text-align: center; padding: 9px 0; font-size: 11.5px; font-weight: 700;
+    border-radius: 10px; border: 1px solid #dce8e4; color: #6f8a84; background: #fbfdfc;
+  }
+  .seg-btn.active { background: linear-gradient(90deg, #5fae7d, #4a9a78); color: white; border: none; }
+
+  .field { margin-bottom: 16px; }
+  .field-label {
+    font-size: 11.5px; color: #7a8888; margin-bottom: 7px; display: flex; align-items: center; gap: 5px;
+  }
+  .field-label::before { content: "●"; color: #8fb8ad; font-size: 7px; }
+
+  .time-row { display: flex; align-items: center; gap: 10px; }
+  .time-input {
+    flex: 1; border: 1px solid #dce8e4; border-radius: 10px; padding: 9px 12px;
+    font-size: 13px; color: #4a5a5a; background: #fbfdfc; display: flex; justify-content: space-between; align-items: center;
+  }
+  .time-input i { font-size: 14px; color: #b0c0bc; }
+  .time-sep { color: #aab8b4; font-size: 12px; }
+
+  select, .select-fake {
+    width: 100%; border: 1px solid #dce8e4; border-radius: 10px; padding: 9px 12px;
+    font-size: 13px; color: #4a5a5a; background: #fbfdfc;
+    appearance: none; -webkit-appearance: none;
+  }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: #b0c0bc; font-size: 11px; pointer-events: none;
+  }
+
+  .add-row { display: flex; gap: 8px; }
+  .add-row select, .add-row .select-wrap { flex: 1; }
+  button.add {
+    background: linear-gradient(90deg, #d4f5ea, #e0f2fb);
+    color: #0c5c47; border: none; border-radius: 10px;
+    padding: 0 16px; font-size: 12px; font-weight: 700; cursor: not-allowed;
+    white-space: nowrap;
+  }
+
+  .chip-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .chip {
+    background: #eef6f2; color: #4a8a72; font-size: 11px; font-weight: 700;
+    padding: 5px 10px; border-radius: 99px; display: flex; align-items: center; gap: 4px;
+  }
+
+  .checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #5a6a6a; }
+  .check-box {
+    width: 16px; height: 16px; border: 1.5px solid #cdd8d4; border-radius: 4px;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .count-row { display: flex; align-items: center; gap: 10px; }
+  .count-row input { width: 70px; }
+  .count-row span { font-size: 12.5px; color: #7a8888; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle {
+    width: 38px; height: 22px; border-radius: 99px; background: #dde6e2; position: relative;
+  }
+  .toggle::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+
+  input[type="text"], input[type="number"] {
+    width: 100%; border: 1px solid #dce8e4; border-radius: 10px; padding: 9px 12px;
+    font-size: 13px; color: #4a5a5a; background: #fbfdfc;
+  }
+
+  .preview {
+    background: #1c2424; color: #c8d6d2; border-radius: 12px; padding: 16px;
+    font-size: 11.5px; line-height: 1.85; margin: 18px 0 14px; white-space: pre-wrap;
+  }
+  .preview .hl { color: #8fd4b0; font-weight: 700; }
+
+  button.copy {
+    width: 100%; background: linear-gradient(90deg, #4a9a78, #3d8a98);
+    color: white; border: none; border-radius: 12px; padding: 13px 0;
+    font-size: 14px; font-weight: 700; cursor: not-allowed; opacity: 0.9;
+  }
+
+  .mock-note {
+    font-size: 10.5px; color: #b08a9a;
+    background: rgba(251,234,240,0.7);
+    border: 1px solid #f5d8e4;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin: 14px auto 0;
+    max-width: 420px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 11px; color: #8fb8ad; letter-spacing: 0.16em; text-transform: uppercase;
+    margin-bottom: 4px; font-weight: 700; text-align: center;
+  }
+  h1 { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: #4a5a5a; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <p class="subtitle">Tool 🛠</p>
+  <h1>LINE報告テンプレ</h1>
+
+  <div class="app-card">
+
+    <div class="header">
+      <p class="header-title"><i class="ti ti-clipboard-text" style="font-size:16px;"></i> LINE報告テンプレ</p>
+      <p class="header-sub">時間を自動取得しました ✅</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="start"><i class="ti ti-circle-filled dot-start"></i>開始</div>
+      <div class="tab" data-tab="end"><i class="ti ti-circle-filled dot-end"></i>終了</div>
+      <div class="tab" data-tab="template"><i class="ti ti-file-text"></i>定型文</div>
+      <div class="tab" data-tab="memo"><i class="ti ti-pin"></i>メモ</div>
+      <div class="tab" data-tab="settings"><i class="ti ti-settings"></i>設定</div>
+    </div>
+
+    <!-- 開始 -->
+    <div class="panel active" id="panel-start">
+      <div class="seg">
+        <div class="seg-btn active">通常</div>
+        <div class="seg-btn">変更</div>
+        <div class="seg-btn">変更予告</div>
+        <div class="seg-btn">本日休み</div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">作業時間</p>
+        <div class="time-row">
+          <div class="time-input">10:00 <i class="ti ti-clock"></i></div>
+          <span class="time-sep">〜</span>
+          <div class="time-input">12:00 <i class="ti ti-clock"></i></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">体調</p>
+        <div class="select-wrap"><div class="select-fake">良好</div></div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">作業内容</p>
+        <div class="add-row">
+          <div class="select-wrap"><div class="select-fake">リサーチ</div></div>
+          <button class="add">＋追加</button>
+        </div>
+        <div class="chip-row"><span class="chip">リサーチ ×</span></div>
+      </div>
+
+      <div class="field" style="margin-bottom: 4px;">
+        <p class="field-label">作業量</p>
+        <div class="select-wrap"><div class="select-fake">（空白）</div></div>
+      </div>
+
+      <div class="preview">お疲れ様です。
+・・・・・・・・・・
+<span class="hl">【作業開始】</span>
+10:00から作業開始します。
+体調　：良好
+作業の予定：
+　10:00〜12:00
+作業内容：リサーチ
+作業量：
+・・・・・・・・・・
+よろしくお願いします🙇</div>
+
+      <button class="copy">コピーする</button>
+    </div>
+
+    <!-- 終了 -->
+    <div class="panel" id="panel-end">
+      <div class="seg">
+        <div class="seg-btn active">通常終了</div>
+        <div class="seg-btn">早め終了</div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">定型の挨拶（複数選択可）</p>
+        <div class="checklist">
+          <div class="check-item"><span class="check-box"></span>お疲れ様です。</div>
+          <div class="check-item"><span class="check-box"></span>遅記ありがとうございます。</div>
+          <div class="check-item"><span class="check-box"></span>ご対応ありがとうございます。</div>
+          <div class="check-item"><span class="check-box"></span>お手数ですが、スプレッドシートのリサーチ作業の追記をお願いできましてもよろしいでしょうか。</div>
+          <div class="check-item"><span class="check-box"></span>今週のスケジュールを共有します。よろしくお願いします。</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">作業時間</p>
+        <div class="time-row">
+          <div class="time-input">10:00 <i class="ti ti-clock"></i></div>
+          <span class="time-sep">〜</span>
+          <div class="time-input">12:00 <i class="ti ti-clock"></i></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">休憩時間</p>
+        <div class="count-row"><input type="text" value="0"><span>分</span></div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">作業内容</p>
+        <div class="add-row">
+          <div class="select-wrap"><div class="select-fake">リサーチ</div></div>
+          <button class="add">＋追加</button>
+        </div>
+        <div class="chip-row"><span class="chip">リサーチ ×</span></div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">作業出来高</p>
+        <div class="count-row"><input type="text" value="0"><span>件</span></div>
+      </div>
+
+      <div class="field">
+        <div class="toggle-row">
+          <p class="field-label" style="margin-bottom:0;">入力漏れあり</p>
+          <div class="toggle"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <p class="field-label">【明日の予定】 翌日</p>
+        <div class="time-row">
+          <div class="time-input">10:00 <i class="ti ti-clock"></i></div>
+          <span class="time-sep">〜</span>
+          <div class="time-input">12:00 <i class="ti ti-clock"></i></div>
+        </div>
+      </div>
+
+      <div class="preview">【作業終了】
+作業時間：
+　10:00〜12:00
+（休憩時間：0分）
+作業内容：リサーチ
+作業出来高：0件
+・・・・・・・・・・
+【明日の予定】
+翌日
+　10:00〜12:00
+で作業する予定です。
+お疲れ様でした🙇</div>
+
+      <button class="copy">コピーする</button>
+    </div>
+
+    <!-- 定型文 -->
+    <div class="panel" id="panel-template">
+      <div class="empty-panel">
+        <i class="ti ti-file-text"></i>
+        定型文タブ（準備中）
+      </div>
+    </div>
+
+    <!-- メモ -->
+    <div class="panel" id="panel-memo">
+      <div class="empty-panel">
+        <i class="ti ti-pin"></i>
+        メモタブ（準備中）
+      </div>
+    </div>
+
+    <!-- 設定 -->
+    <div class="panel" id="panel-settings">
+      <div class="empty-panel">
+        <i class="ti ti-settings"></i>
+        設定タブ（準備中）
+      </div>
+    </div>
+
+  </div>
+
+  <p class="mock-note">※これは実物のUIに近づけたモックです。表示・タブ切替のみで、入力や送信などの実際の動作はしません。</p>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
+</body>
+</html>
