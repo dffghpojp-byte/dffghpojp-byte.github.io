@@ -229,6 +229,16 @@
     <div class="proj-link-row" id="proj-links"></div>
   </div>
 
+  <div id="demo-section" style="display:none; margin-top:16px;">
+    <p class="section-title">🖥 デモ</p>
+    <div style="border-radius:12px; overflow:hidden; border:1px solid rgba(180,220,210,0.3); box-shadow:0 3px 12px rgba(150,190,200,0.15);">
+      <iframe id="demo-iframe" style="width:100%; height:600px; border:none; background:white;"></iframe>
+    </div>
+    <p style="text-align:right; margin-top:8px;">
+      <a id="demo-open" href="#" target="_blank" style="font-size:11.5px; color:#5aabbc; text-decoration:none; font-weight:700;">↗ 別タブで開く</a>
+    </p>
+  </div>
+
   <div id="related-section" style="display:none; margin-top:16px;">
     <p class="section-title">🔗 関連プロジェクト</p>
     <div id="related-list" style="display:flex; flex-direction:column; gap:10px;"></div>
@@ -258,23 +268,27 @@ const PROJECTS = {
     desc: "一枚のシート画像から最大40個のスタンプ・絵文字を自動切り出しできるWebアプリ。背景色の透過、グリッド分割ラインのドラッグ調整、APNGアニメーション出力にも対応。Claude AI を使って開発。",
     tags: [["Claude AI","tag-blue"],["Web アプリ","tag-mint"]],
     link: { label: "▶ アプリを開く", url: "stamp-cutter.html" },
+    demo: "stamp-cutter.html",
     related: [{ id: "line-stamps", note: "企画で生成した画像をこのツールで仕上げ" }]
   },
   "work-report": {
     title: "作業報告テンプレート作成ツール",
     desc: "スプレッドシートの作業管理システムと連携し、報告テンプレートを自動生成するツール。Claude AI を使って開発。",
     tags: [["Claude AI","tag-blue"],["スプレッドシート連携","tag-purple"]],
+    demo: "line-report-template.html",
     related: [{ id: "spreadsheet", note: "このツールと連携する作業管理システム" }]
   },
   "tab-duplicate": {
     title: "ブラウザタブ複製ボタン",
     desc: "現在のタブをワンクリックで複製できるブラウザ向けアプリ。単純な操作の繰り返しをなくすために Claude AI を使って開発。",
-    tags: [["Claude AI","tag-blue"],["ブラウザ","tag-pink"]]
+    tags: [["Claude AI","tag-blue"],["ブラウザ","tag-pink"]],
+    demo: "tab-duplicator.html"
   },
   "spreadsheet": {
     title: "スプレッドシート作業管理システム",
     desc: "タスクの進捗・優先度・担当を一元管理するスプレッドシートベースの作業管理システム。",
     tags: [["スプレッドシート","tag-mint"]],
+    demo: "spreadsheet-demo.html",
     related: [{ id: "work-report", note: "このシステムと連携する報告テンプレート" }]
   },
   "winhero-auto": {
@@ -404,6 +418,13 @@ if (proj) {
     a.className = "btn btn-primary";
     a.textContent = proj.link.label;
     row.appendChild(a);
+  }
+
+  // デモ埋め込み
+  if (proj.demo) {
+    document.getElementById("demo-section").style.display = "block";
+    document.getElementById("demo-iframe").src = proj.demo;
+    document.getElementById("demo-open").href = proj.demo;
   }
 
   // 関連プロジェクト
