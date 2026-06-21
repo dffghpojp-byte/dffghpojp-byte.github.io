@@ -381,58 +381,52 @@ if (proj) {
 
   // 複数画像ギャラリー（images/フォルダから）
   const staticGallery = document.getElementById("proj-gallery-static");
-  const imgCandidates = [
-    "images/" + id + ".jpg",
-    "images/" + id + ".png",
-    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".jpg"),
-    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".png"),
+  const mediaCandidates = [
+    { src: "images/" + id + ".jpg", type: "img" },
+    { src: "images/" + id + ".png", type: "img" },
+    { src: "images/" + id + ".mp4", type: "vid" },
+    ...Array.from({length: 10}, (_, i) => ({ src: "images/" + id + "-" + (i+1) + ".jpg", type: "img" })),
+    ...Array.from({length: 10}, (_, i) => ({ src: "images/" + id + "-" + (i+1) + ".png", type: "img" })),
+    ...Array.from({length: 10}, (_, i) => ({ src: "images/" + id + "-" + (i+1) + ".mp4", type: "vid" })),
   ];
-  const vidCandidates = [
-    "images/" + id + ".mp4",
-    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".mp4"),
-  ];
-  let loadedCount = 0;
 
-  function addMedia(el, isFirst) {
-    loadedCount++;
-    const wrap = document.createElement("div");
-    wrap.style.cssText = loadedCount === 1
-      ? "border-radius:12px; overflow:hidden; margin-bottom:10px;"
-      : "border-radius:12px; overflow:hidden;";
-    el.style.cssText = "width:100%; display:block;";
-    wrap.appendChild(el);
-    if (loadedCount === 1) {
-      staticGallery.insertBefore(wrap, staticGallery.firstChild);
+  Promise.all(mediaCandidates.map(c => {
+    if (c.type === "img") {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve({ el: img, src: c.src });
+        img.onerror = () => resolve(null);
+        img.src = c.src;
+      });
     } else {
-      if (loadedCount === 2) {
-        const grid = document.createElement("div");
-        grid.id = "static-grid";
-        grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;";
-        staticGallery.appendChild(grid);
-      }
-      document.getElementById("static-grid").appendChild(wrap);
+      return fetch(c.src, { method: "HEAD" })
+        .then(r => r.ok ? { type: "vid", src: c.src } : null)
+        .catch(() => null);
     }
-  }
-
-  imgCandidates.forEach(src => {
-    const img = new Image();
-    img.onload = () => { img.alt = ""; addMedia(img); };
-    img.src = src;
-  });
-
-  vidCandidates.forEach(src => {
-    fetch(src, { method: "HEAD" }).then(r => {
-      if (r.ok) {
-        const vid = document.createElement("video");
-        vid.src = src;
-        vid.controls = true;
-        vid.preload = "metadata";
-        vid.playsInline = true;
-        const wrap = document.createElement("div");
-        wrap.style.cssText = "border-radius:12px; overflow:hidden;";
-        vid.style.cssText = "width:100%; display:block;";
-        wrap.appendChild(vid);
-        if (!document.getElementById("static-grid")) {
+  })).then(results => {
+    const loaded = results.filter(Boolean);
+    loaded.forEach((item, i) => {
+      const wrap = document.createElement("div");
+      wrap.style.cssText = i === 0
+        ? "border-radius:12px; overflow:hidden; margin-bottom:10px;"
+        : "border-radius:12px; overflow:hidden;";
+      let el;
+      if (item.type === "vid") {
+        el = document.createElement("video");
+        el.src = item.src;
+        el.controls = true;
+        el.preload = "metadata";
+        el.playsInline = true;
+      } else {
+        el = item.el;
+        el.alt = "";
+      }
+      el.style.cssText = "width:100%; display:block;";
+      wrap.appendChild(el);
+      if (i === 0) {
+        staticGallery.insertBefore(wrap, staticGallery.firstChild);
+      } else {
+        if (i === 1) {
           const grid = document.createElement("div");
           grid.id = "static-grid";
           grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;";
@@ -440,7 +434,7 @@ if (proj) {
         }
         document.getElementById("static-grid").appendChild(wrap);
       }
-    }).catch(() => {});
+    });
   });
 
   if (proj.link) {
