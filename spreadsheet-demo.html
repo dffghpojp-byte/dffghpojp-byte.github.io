@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スプレッドシート作業管理システム</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    color: #4a5a5a;
+    background: linear-gradient(160deg, #e8f7f2 0%, #eaf3fb 35%, #f3edfb 70%, #fdf0f5 100%);
+    line-height: 1.6;
+    padding: 24px 14px;
+    min-height: 100vh;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .subtitle {
+    font-size: 11px; color: #8fb8ad; letter-spacing: 0.16em; text-transform: uppercase;
+    margin-bottom: 4px; font-weight: 700; text-align: center;
+  }
+  h1 { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: #4a5a5a; text-align: center; }
+
+  .app-card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(150,190,200,0.18);
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 18px;
+  }
+
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .tab {
+    padding: 7px 14px; font-size: 11.5px; font-weight: 700;
+    border-radius: 8px 8px 0 0; cursor: pointer;
+    border: 1px solid #dce8e4; border-bottom: none;
+    background: #f5f8f6; color: #8a9a96;
+  }
+  .tab.active { background: #fff; color: #4a5a5a; border-bottom: 2px solid #fff; margin-bottom: -1px; }
+
+  .summary {
+    display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .summary-card {
+    background: #fbfdfc; border: 1px solid #dce8e4; border-radius: 10px;
+    padding: 10px 14px; flex: 1; min-width: 120px;
+  }
+  .summary-card .label { font-size: 10.5px; color: #8a9a96; margin-bottom: 2px; }
+  .summary-card .value { font-size: 18px; font-weight: 800; color: #4a5a5a; }
+  .summary-card .value small { font-size: 12px; font-weight: 500; color: #8a9a96; }
+
+  .calendar-header {
+    display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;
+  }
+  .calendar-header h2 { font-size: 16px; font-weight: 800; color: #4a5a5a; }
+  .cal-nav { background: none; border: 1px solid #dce8e4; border-radius: 6px; padding: 4px 10px; cursor: default; color: #8a9a96; font-size: 13px; }
+
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 2px; margin-bottom: 16px;
+  }
+  .cal-day-label {
+    text-align: center; font-size: 10.5px; font-weight: 700; color: #8a9a96; padding: 4px 0;
+  }
+  .cal-day-label.sun { color: #d4607a; }
+  .cal-day-label.sat { color: #5a8ad4; }
+  .cal-cell {
+    text-align: center; padding: 6px 2px; font-size: 11px; border-radius: 6px; min-height: 36px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .cal-cell .day-num { font-weight: 700; font-size: 12px; color: #4a5a5a; }
+  .cal-cell .day-mark { font-size: 9px; }
+  .cal-cell.work { background: #eef6f2; }
+  .cal-cell.work .day-mark { color: #5fae7d; }
+  .cal-cell.off { background: #f5f0f8; }
+  .cal-cell.off .day-mark { color: #b08aaa; }
+  .cal-cell.today { border: 2px solid #e8a040; }
+  .cal-cell.sun .day-num { color: #d4607a; }
+  .cal-cell.sat .day-num { color: #5a8ad4; }
+  .cal-cell.empty { background: none; }
+
+  table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  thead th {
+    background: #e8a040; color: white; padding: 8px 6px;
+    font-size: 11px; font-weight: 700; text-align: center;
+    position: sticky; top: 0;
+  }
+  tbody td {
+    padding: 6px; text-align: center; border-bottom: 1px solid #eef0ec;
+  }
+  tbody tr:hover { background: #f5faf8; }
+  tbody tr.weekend { background: #faf5f0; }
+  tbody tr.today-row { background: #fff8e8; }
+  .mark-work { color: #5fae7d; font-weight: 700; }
+  .mark-off { color: #d4607a; font-weight: 700; }
+  .mark-star { color: #e8a040; font-weight: 700; }
+  .day-sun { color: #d4607a; font-weight: 700; }
+  .day-sat { color: #5a8ad4; font-weight: 700; }
+
+  .table-wrap {
+    max-height: 400px; overflow-y: auto; border: 1px solid #dce8e4; border-radius: 10px;
+  }
+
+  .legend {
+    display: flex; gap: 12px; margin-top: 12px; font-size: 10.5px; color: #8a9a96; flex-wrap: wrap;
+  }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+
+  .mock-note {
+    font-size: 10.5px; color: #b08a9a;
+    background: rgba(251,234,240,0.7);
+    border: 1px solid #f5d8e4;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin: 14px auto 0;
+    max-width: 720px;
+    text-align: center;
+  }
+
+  .btn-row {
+    display: flex; gap: 8px; margin-bottom: 16px;
+  }
+  .btn {
+    padding: 8px 16px; border-radius: 8px; font-size: 11.5px; font-weight: 700;
+    border: none; cursor: default;
+  }
+  .btn-reset { background: #f0e8e0; color: #a08060; }
+  .btn-copy { background: linear-gradient(90deg, #e8a040, #d09030); color: white; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <p class="subtitle">Tool 🛠</p>
+  <h1>スプレッドシート作業管理システム</h1>
+
+  <div class="app-card">
+
+    <div class="tabs">
+      <div class="tab active">6月記録</div>
+      <div class="tab">予定共有</div>
+      <div class="tab">来月共有</div>
+      <div class="tab">祝休リスト</div>
+    </div>
+
+    <div class="calendar-header">
+      <span class="cal-nav">◀</span>
+      <h2>6月</h2>
+      <span class="cal-nav">▶</span>
+    </div>
+
+    <div class="summary">
+      <div class="summary-card">
+        <p class="label">最大利用可能日</p>
+        <p class="value">22<small>日</small></p>
+      </div>
+      <div class="summary-card">
+        <p class="label">利用日数</p>
+        <p class="value">14<small>日</small> <small style="color:#8a9a96">/ 22日</small></p>
+      </div>
+      <div class="summary-card">
+        <p class="label">休日数</p>
+        <p class="value">1<small>日</small></p>
+      </div>
+      <div class="summary-card">
+        <p class="label">欠勤日数</p>
+        <p class="value">0<small>日</small></p>
+      </div>
+      <div class="summary-card">
+        <p class="label">総作業時間</p>
+        <p class="value">21:30<small>:00</small></p>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div class="btn btn-reset">リセット</div>
+      <div class="btn btn-copy">転記</div>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>予定</th>
+          <th>利用</th>
+          <th>開始時刻</th>
+          <th>終了時刻</th>
+          <th>休憩</th>
+          <th>作業時間</th>
+          <th>備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 <span class="day-sun">日</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>2 月</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>10:30</td><td></td><td>0:30</td><td></td></tr>
+        <tr><td>3 火</td><td class="mark-work">○</td><td class="mark-off">×</td><td>11:00</td><td>12:00</td><td></td><td>1:00</td><td></td></tr>
+        <tr><td>4 木</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:30</td><td>12:00</td><td></td><td>1:30</td><td></td></tr>
+        <tr><td>5 金</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr class="weekend"><td>6 <span class="day-sat">土</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="weekend"><td>7 <span class="day-sun">日</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>8 月</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr><td>9 火</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr><td>10 水</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr><td>11 木</td><td class="mark-work">○</td><td>☆</td><td>10:00</td><td>12:00</td><td></td><td>1:30</td><td></td></tr>
+        <tr><td>12 金</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr class="weekend"><td>13 <span class="day-sat">土</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="weekend"><td>14 <span class="day-sun">日</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>15 月</td><td class="mark-star">★</td><td class="mark-work">○</td><td>11:30</td><td>12:00</td><td></td><td>0:30</td><td></td></tr>
+        <tr><td>16 火</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr><td>17 水</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr><td>18 木</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>10:30</td><td></td><td>0:30</td><td></td></tr>
+        <tr><td>19 金</td><td class="mark-work">○</td><td class="mark-work">○</td><td>10:00</td><td>12:00</td><td></td><td>2:00</td><td></td></tr>
+        <tr class="weekend"><td>20 <span class="day-sat">土</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="weekend today-row"><td>21 <span class="day-sun">日</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>22 月</td><td class="mark-work">○</td><td></td><td>10:00</td><td>12:00</td><td></td><td></td><td></td></tr>
+        <tr><td>23 火</td><td class="mark-work">○</td><td></td><td>10:00</td><td>12:00</td><td></td><td></td><td></td></tr>
+        <tr><td>24 水</td><td class="mark-work">○</td><td></td><td>10:00</td><td>12:00</td><td></td><td></td><td></td></tr>
+        <tr><td>25 木</td><td class="mark-work">○</td><td></td><td>10:00</td><td>12:00</td><td></td><td></td><td></td></tr>
+        <tr><td>26 金</td><td class="mark-work">○</td><td></td><td>10:00</td><td>12:00</td><td></td><td></td><td></td></tr>
+        <tr class="weekend"><td>27 <span class="day-sat">土</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="weekend"><td>28 <span class="day-sun">日</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>29 月</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>30 火</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="legend">
+      <span><span class="mark-work">○</span> = 作業</span>
+      <span><span class="mark-off">×</span> = 休</span>
+      <span><span class="mark-star">★</span> = 変更</span>
+      <span>△ = 欠勤</span>
+      <span>☆ = 済不</span>
+    </div>
+
+  </div>
+
+  <p class="mock-note">※これは実物のUIに近づけたモックです。表示のみで、入力や送信などの実際の動作はしません。</p>
+
+</div>
+</body>
+</html>
