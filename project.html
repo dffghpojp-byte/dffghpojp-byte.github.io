@@ -264,7 +264,7 @@ const PROJECTS = {
     title: "作業報告テンプレート作成ツール",
     desc: "スプレッドシートの作業管理システムと連携し、報告テンプレートを自動生成するツール。Claude AI を使って開発。",
     tags: [["Claude AI","tag-blue"],["スプレッドシート連携","tag-purple"]],
-    related: ["spreadsheet"]
+    related: [{ id: "spreadsheet", note: "このツールと連携する作業管理システム" }]
   },
   "tab-duplicate": {
     title: "ブラウザタブ複製ボタン",
@@ -275,7 +275,7 @@ const PROJECTS = {
     title: "スプレッドシート作業管理システム",
     desc: "タスクの進捗・優先度・担当を一元管理するスプレッドシートベースの作業管理システム。",
     tags: [["スプレッドシート","tag-mint"]],
-    related: ["work-report"]
+    related: [{ id: "work-report", note: "このシステムと連携する報告テンプレート" }]
   },
   "winhero-auto": {
     title: "イベント周回自動クリックツール",
