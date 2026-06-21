@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LINE スタンプ カッター v1.0 — 使い方マニュアル</title>
+  <style>
+    :root {
+      --blue-100: #e8f4fd;
+      --blue-200: #c8e6fa;
+      --blue-300: #a3d4f5;
+      --blue-400: #7bb3e0;
+      --blue-500: #5ba3d9;
+      --blue-600: #3d8ec7;
+      --white: #ffffff;
+      --gray-500: #6a8da8;
+      --gray-700: #3d5a72;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, var(--blue-100) 0%, #f0f7ff 50%, var(--blue-200) 100%);
+      min-height: 100vh;
+      color: var(--gray-700);
+      line-height: 1.8;
+    }
+    header {
+      background: linear-gradient(90deg, var(--blue-400), var(--blue-500));
+      color: white;
+      padding: 20px 24px 18px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(91,163,217,0.35);
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+    header p { font-size: 0.78rem; opacity: 0.8; margin-top: 4px; }
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 12px rgba(91,163,217,0.15);
+      padding: 24px;
+    }
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      color: var(--blue-600);
+      margin-bottom: 14px;
+    }
+    h2 .badge {
+      background: var(--blue-500);
+      color: white;
+      border-radius: 50%;
+      width: 26px; height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    h3 {
+      font-size: 0.92rem;
+      color: var(--blue-600);
+      margin: 18px 0 8px;
+      border-left: 3px solid var(--blue-400);
+      padding-left: 10px;
+    }
+    p, li { font-size: 0.9rem; }
+    ul, ol { padding-left: 1.5em; margin: 6px 0 12px; }
+    li { margin-bottom: 4px; }
+    .tip {
+      background: var(--blue-100);
+      border-left: 3px solid var(--blue-400);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      color: var(--gray-700);
+      margin: 10px 0;
+    }
+    .warn {
+      background: #fdf5ec;
+      border-left: 3px solid #e8a14a;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      color: #7a5a2a;
+      margin: 10px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 10px 0;
+    }
+    th {
+      background: var(--blue-100);
+      color: var(--blue-600);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--blue-300);
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--blue-100);
+    }
+    tr:hover td { background: var(--blue-100); }
+    .flow-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0;
+    }
+    .flow-step {
+      background: var(--blue-500);
+      color: white;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: var(--blue-400); font-size: 1.1rem; }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      color: var(--blue-600);
+      border: 2px solid var(--blue-400);
+      padding: 8px 20px;
+      border-radius: 24px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+    .back-link:hover { background: var(--blue-100); }
+    .key {
+      display: inline-block;
+      background: var(--blue-100);
+      color: var(--blue-600);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid var(--blue-200);
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: var(--blue-300);
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.15rem; }
+      .card { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📖 LINE スタンプ カッター v1.0 — 使い方マニュアル</h1>
+  <p>by @ユイカ</p>
+</header>
+
+<main>
+
+  <!-- ── 概要 ── -->
+  <div class="card">
+    <h2>🖼️ このツールでできること</h2>
+    <p>AIで生成したスプライトシート（1枚の大きな画像にスタンプ/絵文字がグリッド状に並んだ画像）を、LINE Creators Market に提出できる個別画像に自動で切り出すツールです。</p>
+
+    <h3>主な機能</h3>
+    <ul>
+      <li><strong>グリッド自動分割</strong> — プリセットまたはカスタムで列×行を指定</li>
+      <li><strong>分割ライン微調整</strong> — ドラッグで位置を自由に修正</li>
+      <li><strong>背景透過</strong> — 指定した色をフラッドフィルで自然に透過</li>
+      <li><strong>LINE規格リサイズ</strong> — 絵文字（180×180px）/ スタンプ（最大370×320px）に自動変換</li>
+      <li><strong>tab.png / main.png 自動生成</strong> — 001番目の画像から自動作成</li>
+      <li><strong>APNGアニメーション出力</strong> — 選択フレームからアニメーション絵文字を生成</li>
+      <li><strong>ZIP一括ダウンロード</strong> — 全画像をまとめてDL</li>
+    </ul>
+
+    <h3>基本フロー</h3>
+    <div class="flow-box">
+      <span class="flow-step">① アップロード</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">② グリッド設定</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">③ プレビュー確認</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">④ 切り出し実行</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑤ 選択・ZIP DL</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑥ APNG出力</span>
+    </div>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="card">
+    <h2><span class="badge">1</span> スタンプシートをアップロード</h2>
+    <p>ドロップゾーンをクリックするか、画像ファイルをドラッグ&ドロップしてアップロードします。</p>
+    <table>
+      <tr><th>対応形式</th><td>PNG / JPG / WEBP</td></tr>
+      <tr><th>推奨形式</th><td>PNG（透過を扱うため）</td></tr>
+      <tr><th>推奨画像</th><td>AIで生成したグリッド状のスプライトシート</td></tr>
+    </table>
+    <div class="tip">💡 Gemini や ChatGPT でスプライトシートを生成する際に、「5列×8行のグリッド、グリーンバック背景」と指定するとスムーズに切り出せます。</div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="card">
+    <h2><span class="badge">2</span> グリッド・背景の設定</h2>
+
+    <h3>プリセット選択</h3>
+    <p>用途に合わせてプリセットを選びます。プリセットを押すと列×行と出力タイプが自動で切り替わります。</p>
+
+    <table>
+      <tr><th colspan="3">🎨 絵文字用（出力 180×180px）</th></tr>
+      <tr><td>4×10</td><td>40枚</td><td>横長シート向け</td></tr>
+      <tr><td>5×8</td><td>40枚</td><td>正方形に近いシート向け（デフォルト）</td></tr>
+      <tr><th colspan="3">🖼️ スタンプ用（出力 最大370×320px）</th></tr>
+      <tr><td>4×8</td><td>32枚</td><td>フルセット</td></tr>
+      <tr><td>4×4</td><td>16枚</td><td>ハーフセット</td></tr>
+      <tr><td>2×4</td><td>8枚</td><td>スターターセット</td></tr>
+    </table>
+
+    <h3>カスタム入力</h3>
+    <p>プリセット以外の列×行を使いたい場合は「カスタム：列 / 行」の数値を変更します。<br/>カスタム時は「絵文字」「スタンプ」のラジオボタンで出力タイプを選んでください。</p>
+
+    <h3>背景色の除去</h3>
+    <p>カラーピッカーで除去したい背景色を選びます。<strong>画像の縁から繋がっている同色ピクセルのみ</strong>を透過するフラッドフィル方式なので、キャラクター内部の同色（目の白など）は消えません。</p>
+    <table>
+      <tr><th>設定</th><th>説明</th></tr>
+      <tr><td>背景色ピッカー</td><td>クリックして除去する色を選択（デフォルト：緑 <span class="key">#00c300</span>）</td></tr>
+      <tr><td>透過しきい値</td><td>スライダーで感度を調整（大きい＝広範囲を透過）。文字が消える場合は下げる</td></tr>
+    </table>
+    <div class="tip">💡 白背景のシートを使う場合は、カラーピッカーを白（#ffffff）に変更してください。</div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="card">
+    <h2><span class="badge">3</span> プレビュー・分割ラインの調整</h2>
+    <p>アップロード後、プレビューキャンバスに画像と分割ラインが表示されます。各セルの中央に番号（001〜）が表示されます。</p>
+
+    <h3>分割ラインの調整</h3>
+    <ul>
+      <li>縦ラインのハンドル（白い丸）をドラッグすると<strong>列の境界</strong>を移動できます</li>
+      <li>横ラインのハンドルをドラッグすると<strong>行の境界</strong>を移動できます</li>
+      <li>ライン上の任意の位置をドラッグしても移動可能です</li>
+      <li>タッチ操作（スマホ・タブレット）にも対応しています</li>
+    </ul>
+    <div class="tip">💡 AIが生成したシートはグリッドが完全に均等でないことが多いので、ここで微調整するとキレイに切り出せます。</div>
+  </div>
+
+  <!-- ── STEP 4 ── -->
+  <div class="card">
+    <h2><span class="badge">4</span> 切り出してダウンロード</h2>
+    <p><span class="key">✂️ 切り出し開始</span> ボタンを押すと処理が始まります。プログレスバーで進捗を確認できます。</p>
+
+    <h3>自動生成される画像</h3>
+    <table>
+      <tr><th>ファイル名</th><th>サイズ</th><th>用途</th></tr>
+      <tr><td>stamp_001.png 〜</td><td>絵文字: 180×180px / スタンプ: 最大370×320px</td><td>個別スタンプ・絵文字画像</td></tr>
+      <tr><td>main.png</td><td>240×240px</td><td>スタンプセットのメイン画像（001番目から自動生成）</td></tr>
+      <tr><td>tab.png</td><td>96×74px</td><td>トークルームタブ画像（001番目から自動生成）</td></tr>
+    </table>
+
+    <div class="tip">💡 <span class="key">🔄 リセット</span> を押すと最初からやり直せます。</div>
+  </div>
+
+  <!-- ── STEP 5 ── -->
+  <div class="card">
+    <h2><span class="badge">5</span> 切り出しプレビュー・フレーム選択</h2>
+    <p>切り出し完了後、各スタンプ画像がサムネイル一覧で表示されます。ファイル名とサイズ（KB）も確認できます。</p>
+
+    <h3>フレーム選択</h3>
+    <p>サムネイルをクリックすると<strong>選択 / 解除</strong>を切り替えられます。選択状態は STEP 6 の APNG 出力に反映されます。</p>
+    <table>
+      <tr><th>操作</th><th>説明</th></tr>
+      <tr><td>サムネイルをクリック</td><td>個別に選択 / 解除を切り替え</td></tr>
+      <tr><td><span class="key">全選択</span> ボタン</td><td>すべてのフレームを選択状態にする</td></tr>
+      <tr><td><span class="key">全解除</span> ボタン</td><td>すべてのフレームの選択を解除する</td></tr>
+      <tr><td><span class="key">⬇️ ZIP でまとめてDL</span></td><td>全画像（main.png・tab.png 含む）を ZIP でダウンロード</td></tr>
+    </table>
+
+    <div class="tip">💡 選択中の枚数は <strong>「X / Y 枚選択中」</strong> で常に確認できます。<br/>
+      青枠 + ✓ マーク = 選択中 / 半透明 = 未選択</div>
+  </div>
+
+  <!-- ── STEP 6: APNG 詳細 ── -->
+  <div class="card">
+    <h2><span class="badge">6</span> ✨ APNGアニメーション出力（詳細ガイド）</h2>
+    <p>STEP 5 で選択したフレームを使って、<strong>LINE アニメーション絵文字</strong>用の APNG ファイルを生成します。</p>
+
+    <div class="warn">⚠️ このセクションは STEP 4「切り出し開始」を実行した後に表示されます。<br/>
+      STEP 5 でフレームが 1 枚以上選択されていないとボタンが無効になります。</div>
+
+    <h3>設定項目</h3>
+    <table>
+      <tr><th>設定</th><th>説明</th><th>デフォルト値</th></tr>
+      <tr>
+        <td><strong>フレーム遅延</strong></td>
+        <td>各フレームの表示時間（ミリ秒単位）。<br/>小さい＝速い、大きい＝ゆっくり。</td>
+        <td>100ms（10fps）</td>
+      </tr>
+      <tr>
+        <td><strong>ループ回数</strong></td>
+        <td>アニメーションの繰り返し回数。<br/>0 = 無限ループ。</td>
+        <td>0（無限ループ）</td>
+      </tr>
+      <tr>
+        <td><strong>出力サイズ</strong></td>
+        <td>APNG画像の出力ピクセルサイズ。<br/>LINE絵文字なら 180×180 を選択。</td>
+        <td>180×180</td>
+      </tr>
+      <tr>
+        <td><strong>出力範囲</strong></td>
+        <td><strong>全フレームで1つのAPNG</strong>：選択中の全フレームを1ファイルに。<br/>
+            <strong>行ごとに分割</strong>：グリッドの行ごとに別ファイルで出力。</td>
+        <td>全フレームで1つ</td>
+      </tr>
+    </table>
+
+    <h3>出力サイズの選び方</h3>
+    <table>
+      <tr><th>サイズ</th><th>用途</th></tr>
+      <tr><td><span class="key">180×180</span></td><td>LINE アニメーション絵文字（公式仕様）</td></tr>
+      <tr><td><span class="key">240×240</span></td><td>高解像度プレビュー用</td></tr>
+      <tr><td><span class="key">320×320</span></td><td>SNS等での利用</td></tr>
+      <tr><td><span class="key">元サイズ</span></td><td>切り出したサイズのまま（リサイズなし）</td></tr>
+    </table>
+
+    <h3>「行ごとに分割」の使い方</h3>
+    <p>例えば 5列×8行（40枚）のシートで「行ごとに分割」を選ぶと、<strong>8 個の APNG ファイル</strong>が生成されます。</p>
+    <ul>
+      <li><code>emoji_row01.apng</code> — 1行目のフレーム（001〜005）</li>
+      <li><code>emoji_row02.apng</code> — 2行目のフレーム（006〜010）</li>
+      <li>…以下同様</li>
+    </ul>
+    <p>1行 = 1キャラクターのアニメーション、のようにシートを作ると便利です。</p>
+
+    <h3>操作手順</h3>
+    <ol>
+      <li>STEP 5 のプレビューで、APNG に含めたいフレームをクリックして<strong>選択</strong>する（デフォルト：全選択）</li>
+      <li>STEP 6 でフレーム遅延、ループ回数、出力サイズ、出力範囲を設定</li>
+      <li><span class="key">✨ APNGアニメを生成・DL</span> ボタンを押す</li>
+      <li>生成結果（ファイル名・フレーム数・ファイルサイズ）が表示される</li>
+      <li>APNG ファイルが自動でダウンロードされる</li>
+    </ol>
+
+    <h3>生成結果の見方</h3>
+    <p>生成完了後、緑のバーに以下のような情報が表示されます：</p>
+    <p style="background:linear-gradient(90deg,#d0eedd,#c5e8f0);border-radius:6px;padding:8px 14px;font-size:0.85rem;color:#2d7d5a;font-weight:600;margin:8px 0;">
+      ✅ emoji_all.apng　6フレーム　19KB
+    </p>
+    <ul>
+      <li><strong>ファイル名</strong> — ダウンロードされたファイル名</li>
+      <li><strong>フレーム数</strong> — 選択されたフレーム数</li>
+      <li><strong>ファイルサイズ</strong> — 実際のファイルサイズ（KB / MB）</li>
+    </ul>
+    <div class="warn">⚠️ LINE アニメーション絵文字は <strong>1 ファイル 300KB 以下</strong>が推奨です。超える場合はフレーム数を減らすか、しきい値を上げて透過範囲を広げてください。</div>
+  </div>
+
+  <!-- ── LINE仕様リファレンス ── -->
+  <div class="card">
+    <h2>📐 LINE Creators Market — 画像仕様リファレンス</h2>
+
+    <h3>LINEスタンプ</h3>
+    <table>
+      <tr><th>項目</th><th>仕様</th></tr>
+      <tr><td>個別スタンプ画像</td><td>最大 370×320px（PNG、背景透過）</td></tr>
+      <tr><td>メイン画像（main.png）</td><td>240×240px</td></tr>
+      <tr><td>タブ画像（tab.png）</td><td>96×74px</td></tr>
+      <tr><td>枚数</td><td>8 / 16 / 24 / 32 / 40枚</td></tr>
+      <tr><td>ファイルサイズ</td><td>各1MB以下</td></tr>
+    </table>
+
+    <h3>LINE絵文字</h3>
+    <table>
+      <tr><th>項目</th><th>仕様</th></tr>
+      <tr><td>個別絵文字画像</td><td>180×180px（PNG、背景透過）</td></tr>
+      <tr><td>タブ画像（tab.png）</td><td>96×74px</td></tr>
+      <tr><td>枚数</td><td>8〜40枚</td></tr>
+      <tr><td>ファイルサイズ</td><td>各1MB以下</td></tr>
+    </table>
+
+    <h3>LINEアニメーション絵文字</h3>
+    <table>
+      <tr><th>項目</th><th>仕様</th></tr>
+      <tr><td>フォーマット</td><td>APNG（背景透過）</td></tr>
+      <tr><td>サイズ</td><td>180×180px</td></tr>
+      <tr><td>フレーム数</td><td>5〜20フレーム</td></tr>
+      <tr><td>ファイルサイズ</td><td>各300KB以下（推奨）</td></tr>
+      <tr><td>ループ</td><td>1〜4回 または 無限</td></tr>
+      <tr><td>カラーモード</td><td>RGB</td></tr>
+    </table>
+  </div>
+
+  <!-- ── FAQ ── -->
+  <div class="card">
+    <h2>❓ よくある質問・トラブルシューティング</h2>
+
+    <h3>Q. 背景が透過されない</h3>
+    <p>カラーピッカーの色がシートの背景色と合っていない可能性があります。ピッカーをクリックして、シートの背景に近い色を選んでください。白背景なら白（#ffffff）を選択します。</p>
+
+    <h3>Q. キャラの一部が消えてしまう</h3>
+    <p>透過しきい値が高すぎる場合、背景に近い色のパーツも消えることがあります。スライダーを左に下げて感度を落としてください。</p>
+
+    <h3>Q. 分割が均等にならない</h3>
+    <p>STEP 3 のプレビューで分割ラインのハンドル（白い丸）をドラッグして位置を手動調整できます。</p>
+
+    <h3>Q. 「フレームが選択されていません」と表示される</h3>
+    <p>STEP 5 のプレビューでフレームが 1 枚も選択されていない状態です。サムネイルをクリックして選択（青枠+✓）するか、「全選択」ボタンを押してください。</p>
+
+    <h3>Q. APNGアニメを生成・DLボタンが押せない（グレー）</h3>
+    <p>STEP 4「切り出し開始」を実行し、STEP 5 で 1 枚以上のフレームを選択する必要があります。</p>
+
+    <h3>Q. APNGファイルが大きすぎる</h3>
+    <ul>
+      <li>フレーム数を減らす（STEP 5 で使わないフレームを解除）</li>
+      <li>出力サイズを 180×180 にする</li>
+      <li>画像の色数を減らす（元画像を最適化）</li>
+    </ul>
+
+    <h3>Q. ブラウザで APNG が動かない</h3>
+    <p>APNG は Chrome、Firefox、Safari、Edge の最新版で対応しています。古いブラウザでは静止画として表示されます。</p>
+
+    <h3>Q. main.png や tab.png はどこ？</h3>
+    <p>ZIP ファイルの中に自動で含まれています。001 番目の画像から自動生成されます。</p>
+  </div>
+
+  <!-- ── ツールに戻る ── -->
+  <div style="text-align:center; margin-top: 8px;">
+    <a href="stamp-cutter.html" class="back-link">🖼️ スタンプカッターに戻る</a>
+  </div>
+
+</main>
+
+<footer>LINE スタンプ カッター v1.0 — 使い方マニュアル — by @ユイカ</footer>
+
+</body>
+</html>
