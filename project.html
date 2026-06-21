@@ -349,8 +349,8 @@ const PROJECTS = {
     tags: [["SNS","tag-pink"]]
   },
   "waist-tuck-text": {
-    title: "ウエストタック シャツ紹介文",
-    desc: "おしゃれ寄せ版と SNS 掲載向けの2バリエーション。商品・作品をより魅力的に伝える文章。",
+    title: "SNS掲載用まとめ",
+    desc: "作品紹介や投稿用に作成した画像・動画・テキストのまとめ。",
     tags: [["SNS","tag-blue"],["紹介文","tag-mint"]]
   }
 };
@@ -376,39 +376,56 @@ if (proj) {
 
   // 複数画像ギャラリー（images/フォルダから）
   const staticGallery = document.getElementById("proj-gallery-static");
-  const candidates = [
+  const imgCandidates = [
     "images/" + id + ".jpg",
     "images/" + id + ".png",
     ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".jpg"),
     ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".png"),
   ];
+  const vidCandidates = [
+    "images/" + id + ".mp4",
+    ...Array.from({length: 10}, (_, i) => "images/" + id + "-" + (i+1) + ".mp4"),
+  ];
   let loadedCount = 0;
-  candidates.forEach(src => {
-    const img = new Image();
-    img.onload = () => {
-      loadedCount++;
-      const wrap = document.createElement("div");
-      wrap.style.cssText = loadedCount === 1
-        ? "border-radius:12px; overflow:hidden; margin-bottom:10px;"
-        : "border-radius:12px; overflow:hidden;";
-      const el = document.createElement("img");
-      el.src = src;
-      el.alt = "";
-      el.style.cssText = "width:100%; display:block;";
-      wrap.appendChild(el);
-      if (loadedCount === 1) {
-        staticGallery.insertBefore(wrap, staticGallery.firstChild);
-      } else {
-        if (loadedCount === 2) {
-          const grid = document.createElement("div");
-          grid.id = "static-grid";
-          grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;";
-          staticGallery.appendChild(grid);
-        }
-        document.getElementById("static-grid").appendChild(wrap);
+
+  function addMedia(el, isFirst) {
+    loadedCount++;
+    const wrap = document.createElement("div");
+    wrap.style.cssText = loadedCount === 1
+      ? "border-radius:12px; overflow:hidden; margin-bottom:10px;"
+      : "border-radius:12px; overflow:hidden;";
+    el.style.cssText = "width:100%; display:block;";
+    wrap.appendChild(el);
+    if (loadedCount === 1) {
+      staticGallery.insertBefore(wrap, staticGallery.firstChild);
+    } else {
+      if (loadedCount === 2) {
+        const grid = document.createElement("div");
+        grid.id = "static-grid";
+        grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;";
+        staticGallery.appendChild(grid);
       }
-    };
+      document.getElementById("static-grid").appendChild(wrap);
+    }
+  }
+
+  imgCandidates.forEach(src => {
+    const img = new Image();
+    img.onload = () => { img.alt = ""; addMedia(img); };
     img.src = src;
+  });
+
+  vidCandidates.forEach(src => {
+    fetch(src, { method: "HEAD" }).then(r => {
+      if (r.ok) {
+        const vid = document.createElement("video");
+        vid.src = src;
+        vid.controls = true;
+        vid.preload = "metadata";
+        vid.playsInline = true;
+        addMedia(vid);
+      }
+    }).catch(() => {});
   });
 
   if (proj.link) {
