@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自己紹介 — works & things</title>
+<style>
+:root{--mint:#6cbfab;--mint-l:#d4f5ea;--blue-l:#e0f2fb;--pink-l:#fbe8f2;--purple-l:#ece4fb;--text:#4a5a5a;--sub:#8a9494;--bg:linear-gradient(160deg,#e8f7f2 0%,#eaf3fb 35%,#f3edfb 70%,#fdf0f5 100%);--shadow:0 6px 24px rgba(150,190,200,.18)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;color:var(--text);background:var(--bg);background-attachment:fixed;min-height:100vh;line-height:1.8}
+nav{position:sticky;top:0;z-index:5;height:52px;padding:0 24px;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border-bottom:1px solid rgba(180,220,210,.3)}
+.back{font-size:12px;font-weight:700;color:#47998a;text-decoration:none;background:var(--mint-l);padding:5px 13px;border-radius:999px}.nav-title{font-size:12px;color:var(--sub);font-weight:700}
+main{max-width:760px;margin:0 auto;padding:42px 24px 80px}.intro{display:grid;grid-template-columns:112px 1fr;gap:28px;align-items:center;background:rgba(255,255,255,.9);border-radius:24px;padding:32px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7)}
+.portrait{width:112px;height:112px;border-radius:34px;display:grid;place-items:center;font-size:52px;background:linear-gradient(135deg,var(--mint-l),var(--purple-l))}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--mint);font-weight:800;margin-bottom:5px}.intro h1{font-size:clamp(22px,3.8vw,29px);line-height:1.45;color:#5a6e8a;margin-bottom:9px;white-space:nowrap}.intro p{font-size:13px;color:var(--sub)}
+.section{margin-top:22px;background:rgba(255,255,255,.86);border-radius:18px;padding:26px 28px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7)}.section h2{font-size:15px;color:#5a6e8a;margin-bottom:13px}.section p{font-size:13px;color:var(--sub)}
+.section-label{display:flex;align-items:center;gap:10px;margin-bottom:15px}.section-label .eyebrow{margin:0}.section-label span:last-child{font-size:12px;color:#5a6e8a;font-weight:800}.section-label::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,rgba(108,191,171,.35),transparent)}
+.lead{font-size:15px!important;color:#5a6e8a!important;font-weight:700;line-height:1.9}.story{display:grid;gap:15px}.story p{line-height:2}.pullquote{margin:4px 0;padding:17px 19px;border-left:4px solid var(--mint);border-radius:0 12px 12px 0;background:linear-gradient(90deg,var(--mint-l),rgba(255,255,255,.25));color:#58726f;font-size:14px;font-weight:700}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.value{border-radius:14px;padding:16px;background:linear-gradient(135deg,var(--blue-l),rgba(255,255,255,.8))}.value:nth-child(2){background:linear-gradient(135deg,var(--mint-l),rgba(255,255,255,.8))}.value:nth-child(3){background:linear-gradient(135deg,var(--pink-l),rgba(255,255,255,.8))}.value strong{display:block;font-size:13px;color:#5a6e8a;margin-bottom:5px}.value span{font-size:11px;color:var(--sub)}
+.history-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.history h3{font-size:12px;color:#5a6e8a;margin-bottom:15px;padding:6px 11px;border-radius:999px;background:var(--blue-l);display:inline-block}.history:nth-child(2) h3{background:var(--pink-l)}.timeline{list-style:none}.timeline li{position:relative;padding:0 0 19px 24px;border-left:2px solid #ccebe3}.timeline li:last-child{padding-bottom:0;border-color:transparent}.timeline li::before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px var(--mint-l)}.year{font-size:10px;color:var(--mint);font-weight:800}.timeline strong{display:block;font-size:12px;color:#5a6e8a;line-height:1.55}.timeline p{font-size:11px}
+.note{margin-top:18px;text-align:center;font-size:11px;color:var(--sub)}
+@media(max-width:560px){main{padding:24px 16px 60px}.intro{grid-template-columns:1fr;text-align:center;padding:26px 20px}.portrait{margin:auto}.intro h1{font-size:23px;white-space:normal;text-wrap:balance}.values,.history-grid{grid-template-columns:1fr}.section{padding:22px 20px}}
+</style>
+</head>
+<body>
+<nav><a class="back" href="index.html">← 作品一覧へ</a><span class="nav-title">自己紹介</span></nav>
+<main>
+  <section class="intro">
+    <div class="portrait" aria-label="仮のプロフィールアイコン">🌱</div>
+    <div><p class="eyebrow">ABOUT ME</p><h1>工夫して、使いやすい形にする。</h1><p>AIやデジタルツールを活用しながら、日常や仕事の中にある「もう少し楽にできたら」を形にしています。</p></div>
+  </section>
+
+  <section class="section">
+    <div class="section-label"><p class="eyebrow">ABOUT ME</p><span>わたしについて</span></div>
+    <p class="lead">ツール開発、イラスト・デザイン、服づくりなど、ジャンルを限定せず「自分で試してみる」ことを大切にしています。小さな疑問や不便でも、調べて、作って、実際に使いながら改良していくのが好きです。</p>
+  </section>
+
+  <section class="section">
+    <h2>これまでと、今</h2>
+    <div class="story">
+      <p>小学校低学年頃から特別支援学級で学び、中学時代に療育手帳を取得しました。その後は特別支援学校ではなく、私立の洋裁専門学校へ進学。高校資格を取得しながら、ものづくりの基礎を学びました。</p>
+      <p>卒業後は障害者手帳を使わず、一般企業で縫製作業を経験。その後、行政機関の事務パートに障害者雇用で入職しました。情報管理の厳しい環境で、限られた機能の中でどう効率化するかを考え、ショートカットキーやタイピングを独学で磨きました。</p>
+      <div class="pullquote">「無いなら、作ればいい。」その精神で、日々手を動かしています。</div>
+      <p>現在はITに強いB型就労支援事業所を利用し、在宅で作業しながら就職活動を進めています。ものづくりや開発など、ジャンルにこだわらず「作りたいものを作る」日々。このポートフォリオは、そんな創作物のお披露目の場として作りました。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>経歴</h2>
+    <div class="history-grid">
+      <div class="history"><h3>🎓 学歴</h3><ol class="timeline">
+        <li><span class="year">2014 / 平成26年</span><strong>洋裁専門学校 卒業</strong><p>ものづくりの基礎を学ぶ。</p></li>
+        <li><span class="year">2014 / 平成26年</span><strong>クラーク記念国際高等学校（通信制）卒業</strong></li>
+        <li><span class="year">2026 / 令和8年</span><strong>日本福祉大学 卒業</strong><p>福祉経営学部 医療・福祉マネジメント学科（通信教育部）</p></li>
+      </ol></div>
+      <div class="history"><h3>💼 職歴</h3><ol class="timeline">
+        <li><span class="year">2014 / 平成26年</span><strong>一般企業 入社</strong><p>縫製作業に従事。</p></li>
+        <li><span class="year">2015 / 平成27年</span><strong>一般企業 退職</strong></li>
+        <li><span class="year">2019 / 平成31年</span><strong>行政機関 入職</strong><p>障害者雇用の事務パート。</p></li>
+        <li><span class="year">2026 / 令和8年</span><strong>行政機関 退職</strong></li>
+        <li><span class="year">2026 / 令和8年</span><strong>B型就労支援 利用開始</strong><p>在宅作業と就職活動を並行。</p></li>
+      </ol></div>
+    </div>
+  </section>
+  <p class="note">※ このページは配置サンプルです。文章とアイコンは後から差し替えられます。</p>
+</main>
+</body>
+</html>
